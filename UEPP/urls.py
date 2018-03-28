@@ -15,7 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import *
+from UEPP.view import hello
+from UEPP.testdb import testdb
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
+    url(r'^hello/$',hello),
+    url(r'^testdb/$',testdb),
 ]
