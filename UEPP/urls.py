@@ -18,9 +18,12 @@ from django.urls import path
 from django.conf.urls import *
 from UEPP.view import hello
 from UEPP.testdb import testdb
+from UEPP import search
 
 urlpatterns = [
     #path('admin/', admin.site.urls),
     url(r'^hello/$',hello),
     url(r'^testdb/$',testdb),
+    url(r'^search-form/$',search.search_form),
+    url(r'^search/$', search.search),
 ]
