@@ -13,5 +13,9 @@ urlpatterns = [
     url(r'^major_information', major_information),
     url(r'^teacher_information', teacher_information),
 
+#教学大纲管理
+    #教学大纲草案
+    url(r'^syllabusOverview_information', syllabusOverview_information),
+
 
 ]

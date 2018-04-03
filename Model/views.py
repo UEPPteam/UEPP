@@ -133,3 +133,29 @@ def teacher_information(request):
             teacherlist.append(teacherInfo)
         data['teacherlist'] = teacherlist
         return render(request, 'teacher.html', data)
+
+
+#教学大纲草案信息
+@csrf_exempt
+def syllabusOverview_information(request):
+    if request.method == 'GET':
+        #username = req.session['username']
+        data={}
+        syllabusOverview = SyllabusOverview.objects.all()
+        syllabusOverviewlist = []
+        for s in syllabusOverview:
+            syoInfo={}
+            syoInfo['id']=s.id
+            syoInfo['syllabussOverviewId']= s.syllabusOverviewId
+            syoInfo['majorId']=s.majorId
+            syoInfo['grade']=s.grade
+            syoInfo['publishDate']=s.publishDate
+            syoInfo['eduSystem']=s.eduSystem
+            syoInfo['totalCredit']=s.totalCredit
+            syoInfo['degree']=s.degree
+            syoInfo['courseModule']=s.courseModule
+            syoInfo['courseType']=s.courseType
+            syoInfo['status']=s.status
+            syllabusOverviewlist.append(syoInfo)
+        data['syllabusOverviewlist'] = syllabusOverviewlist
+        return render(request, 'syllabusOverview.html', data)
