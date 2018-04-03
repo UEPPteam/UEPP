@@ -16,14 +16,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import *
-from UEPP.view import hello
-from UEPP.testdb import testdb
-from UEPP import search
+from Model.views import *
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+admin.autodiscover()
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
-    url(r'^hello/$',hello),
-    url(r'^testdb/$',testdb),
-    url(r'^search-form/$',search.search_form),
-    url(r'^search/$', search.search),
+    url(r'^$', base),
+    path('admin/', admin.site.urls),
+    url(r'^Model/', include('Model.urls')),
+
+    #url(r'^testdb/$', testModelDB.testdb),
+    #url(r'^search-form/$', search.search_form),
+    #url(r'^search/$', search.search),
+    #url(r'^search-post/$', search2.search_post),
+    #url(r'^$', index.index),
 ]
+
+urlpatterns += staticfiles_urlpatterns()
