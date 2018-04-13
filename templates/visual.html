@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% block miancontainer %}
+    <style>
+    body.dragging, body.dragging * {
+        cursor: move !important;
+    }
+    .dragged {
+      position: absolute;
+      opacity: 0.5;
+      z-index: 2000;
+    }
+    .row {
+      margin-left: -20px;
+      *zoom: 1; }
+      /* line 15, /Users/jonasvonandrian/.rvm/gems/ruby-1.9.3-p484/bundler/gems/sass-twitter-bootstrap-06795315e047/lib/bootstrap/_mixins.scss */
+      .row:before, .row:after {
+        display: table;
+        content: ""; }
+      /* line 19, /Users/jonasvonandrian/.rvm/gems/ruby-1.9.3-p484/bundler/gems/sass-twitter-bootstrap-06795315e047/lib/bootstrap/_mixins.scss */
+      .row:after {
+        clear: both; }
+    ol.simple_with_animation li.placeholder {
+      position: relative;
+      /** More li styles **/
+    }
+    ol.simple_with_animation li.placeholder:before {
+      position: absolute;
+      /** Define arrowhead **/
+    }
+    ol, li {
+        padding: 0px;
+    }
+    .span4 {
+        width: 100px;
+    }
+    ol.simple_with_animation {
+        border: 1px solid #999999;
+    }
+    [class*="span"] {
+      float: left;
+      margin-left: 20px;
+    }
+    ol.vertical {
+      margin: 0 0 9px 0;
+      min-height: 10px; }
+      /* line 13, /Users/jonasvonandrian/jquery-sortable/source/css/jquery-sortable.css.sass */
+      ol.vertical li {
+        display: block;
+        margin: 5px;
+        padding: 5px;
+        border: 1px solid #cccccc;
+        color: #0088cc;
+        background: #eeeeee; }
+      /* line 20, /Users/jonasvonandrian/jquery-sortable/source/css/jquery-sortable.css.sass */
+      ol.vertical li.placeholder {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        border: none; }
+        /* line 25, /Users/jonasvonandrian/jquery-sortable/source/css/jquery-sortable.css.sass */
+        ol.vertical li.placeholder:before {
+          position: absolute;
+          content: "";
+          width: 0;
+          height: 0;
+          margin-top: -5px;
+          left: -5px;
+          top: -4px;
+          border: 5px solid transparent;
+          border-left-color: red;
+          border-right: none; }
+    ol.nested_with_switch li, ol.simple_with_animation li, ol.serialization li, ol.default li {
+    cursor: pointer; }
+    </style>
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+           教学大纲管理 > 教学大纲草案 > 可视化
+        </div>
+
+        <div class="smart-widget-inner">
+            <div class="smart-widget-body">
+                <div class="row">
+                    <div class="span4">
+                        <p>第一学期</p>
+                        <ol class="simple_with_animation vertical">
+                          <li id="1">First</li>
+                          <li id="2">Second</li>
+                          <li id="3">Third</li>
+                        </ol>
+                    </div>
+                    <div class="span4">
+                        <p>第二学期</p>
+                        <ol class="simple_with_animation vertical">
+                          <li id="4">First</li>
+                          <li id="5">Second</li>
+                          <li id="6">Third</li>
+                        </ol>
+                    </div>
+                    <div class="span4">
+                        <p>第三学期</p>
+                        <ol class="simple_with_animation vertical">
+                          <li id="7">First</li>
+                          <li id="8">Second</li>
+                          <li id="9">Third</li>
+                        </ol>
+                    </div>
+                    <div class="span4">
+                        <p>第四学期</p>
+                        <ol class="simple_with_animation vertical">
+                          <li>First</li>
+                          <li>Second</li>
+                          <li>Third</li>
+                        </ol>
+                    </div>
+                     <div class="span4">
+                         <p>第五学期</p>
+                        <ol class="simple_with_animation vertical">
+                          <li>First</li>
+                          <li>Second</li>
+                          <li>Third</li>
+                        </ol>
+                    </div>
+                    <div class="span4">
+                        <p>第六学期</p>
+                        <ol class="simple_with_animation vertical">
+                          <li>First</li>
+                          <li>Second</li>
+                          <li>Third</li>
+                        </ol>
+                    </div>
+                    <div class="span4">
+                        <p>第七学期</p>
+                        <ol class="simple_with_animation vertical">
+                          <li>First</li>
+                          <li>Second</li>
+                          <li>Third</li>
+                        </ol>
+                    </div>
+                    <div class="span4">
+                        <p>第八学期</p>
+                        <ol class="simple_with_animation vertical">
+                          <li>First</li>
+                          <li>Second</li>
+                          <li>Third</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script src="../static/js/jquery-sortable-min.js"></script>
+    <script type="text/javascript">
+        {#var data = [{4:[5]}, {1:[3, 4]}, {2:[4]}]#}
+        {#var data_next = [[], [3, 4], [4], [6], [5], [], []]     {#  #}
+        var data_next = {"1":[3, 4], "2":[4], "3":[6], "4":[5], "5":[], "6":[]}     {# 每个节点的下一个节点 #}
+        var data_pre = {"1":[], "2":[], "3":[1], "4":[1, 2], "5":[4], "6":[3]}     {#  每个节点的上一节点 #}
+        var adjustment;
+
+        $("ol.simple_with_animation").sortable({
+          group: 'simple_with_animation',
+          pullPlaceholder: false,
+          // animation on drop
+          onDrop: function  ($item, container, _super) {
+              var left = 100000;
+              var l = $item.offset().left;
+              var i = $item.attr('id');
+              console.log(i);
+              for (var it = 0; it < data_next[i].length; it++) {
+                  var item = $('#' + data_next[i][it]);
+                  console.log(item.offset().left);
+                  if (left > item.offset().left) left = item.offset().left;
+              }
+              var right = 0;
+              for(var it = 0; it < data_pre[i].length; it++){
+                  var item = $('#' + data_pre[i][it]);
+                  console.log(item.offset().left);
+                  if(right < item.offset().left) right = item.offset().left;
+              }
+              if(l <= left+29 && l >= right-29) {
+                  var $clonedItem = $('<li/>').css({height: 0});
+                  $item.before($clonedItem);
+                  $clonedItem.animate({'height': $item.height()});
+
+                  $item.animate($clonedItem.position(), function () {
+                      $clonedItem.detach();
+                      _super($item, container);
+                  });
+              }else{
+                  $nextitem.before($item);
+                  _super($item, container);
+              }
+              for(var it = 0; it < data_pre[i].length; it++){
+                  var item = $('#' + data_pre[i][it]);
+                  item.css({color:"#0088cc"})
+              }
+              for(var it = 0; it < data_next[i].length; it++){
+                  var item = $('#' + data_next[i][it]);
+                  item.css({color:"#0088cc"})
+              }
+              $item.css({
+                color: "#0088cc"
+            });
+          },
+
+          // set $item relative to cursor position
+          onDragStart: function ($item, container, _super) {
+            var offset = $item.offset(),
+                pointer = container.rootGroup.pointer;
+
+            adjustment = {
+              left: pointer.left - offset.left,
+              top: pointer.top - offset.top
+            };
+            $item.css({
+                color: "red"
+            });
+            var i = $item.attr("id");
+            for(var it = 0; it < data_pre[i].length; it++){
+                  var item = $('#' + data_pre[i][it]);
+                  item.css({color:"red"})
+            }
+            for(var it = 0; it < data_next[i].length; it++){
+                  var item = $('#' + data_next[i][it]);
+                  item.css({color:"red"})
+            }
+            window.$nextitem = $item.next();
+            if($nextitem.length == 0) $nextitem = $item.prev();
+            _super($item, container);
+          },
+          onDrag: function ($item, position) {
+            $item.css({
+              left: position.left - adjustment.left,
+              top: position.top - adjustment.top
+            });
+
+          }
+        });
+    </script>
+{% endblock %}
