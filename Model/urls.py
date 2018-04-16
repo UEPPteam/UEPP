@@ -16,5 +16,14 @@ urlpatterns = [
     url(r'^spe_sub', spe_sub),
     url(r'^speAdd', speAdd),
     url(r'^speMod', speMod),
-    url(r'^speDel', spebDel)
+    url(r'^speDel', spebDel),
+
+    #课程模块
+    url(r'^courseModule/', courseModule),
+    url(r'^courseModuleAdd/', courseModuleAdd),
+    url(r'^courseModuleModify/', courseModuleModify),
+    url(r'^courseModuleDelete/', courseModuleDelete),
+    #课程种类
+    url(r'^courseCategory', courseCategory),
+    url(r'^courseCategoryAdd', courseCategoryAdd),
 ]

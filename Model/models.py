@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Course(models.Model):
     courseId = models.CharField(max_length=20)
     courseName = models.CharField(max_length=45)
@@ -27,3 +28,13 @@ class SpecializedSubject(models.Model):
 class CoursesInDisciplines(models.Model):
     subject = models.CharField(max_length=20)
     course = models.CharField(max_length=20)
+
+
+class CourseModule(models.Model):
+    courseModule = models.CharField(max_length=45)
+    description = models.CharField(max_length=180)
+
+
+class CourseCategory(models.Model):
+    courseCategory = models.CharField(max_length=45)
+    description = models.CharField(max_length=180)

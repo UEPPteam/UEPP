@@ -212,3 +212,96 @@ def spebDel(req):
         data['result'] = 'post_success'
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+#课程模块信息
+@csrf_exempt
+def courseModule(request):
+    if request.method == 'GET':
+        #username = req.session['username']
+        data={}
+        courseModule = CourseModule.objects.all()
+        courseModuleList = []
+        for cm in courseModule:
+            courseModuleInfo={}
+            courseModuleInfo['id']=cm.id
+            courseModuleInfo['courseModule']= cm.courseModule
+            courseModuleInfo['description'] = cm.description
+
+            courseModuleList.append(courseModuleInfo)
+        data['courseModuleList'] = courseModuleList
+        return render(request, 'coursemodule.html', data)
+
+# 课程模块-新增
+@csrf_exempt
+def courseModuleAdd(request):
+    if request.method == "POST":
+        courseModule = request.POST.get('courseModule')
+        description = request.POST.get('description')
+
+        coursemodulelist = CourseModule(courseModule=courseModule, description=description)
+        coursemodulelist.save()
+
+        result = 'post_success'
+
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+#课程模块-编辑
+@csrf_exempt
+def courseModuleModify(request):
+    if request.method == 'POST':
+        print("keyixiugai")
+        courseModule = request.POST.get('courseModule')
+        description = request.POST.get('description')
+        id = request.POST.get('id')
+        CourseModule.objects.filter(id=id).update(courseModule=courseModule, description=description)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+#课程模块-删除
+@csrf_exempt
+def courseModuleDelete(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        CourseModule.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+# 课程类别
+@csrf_exempt
+def courseCategory(request):
+    if request.method == 'GET':
+        #username = req.session['username']
+        data={}
+        courseCategory = CourseCategory.objects.all()
+        courseCategoryList = []
+        for c in courseCategory:
+            courseInfo={}
+            courseInfo['id']=c.id
+            courseInfo['courseCategory']= c.courseCategory
+            courseInfo['description']=c.description
+            courseCategoryList.append(courseInfo)
+        data['courseCategoryList'] = courseCategoryList
+        return render(request, 'courseCategory.html', data)
+
+# 课程类别-增加
+@csrf_exempt
+def courseCategoryAdd(request):
+    if request.method == "POST":
+        print("pst---------------")
+        courseCategory = request.POST.get('courseCategory')
+        description = request.POST.get('description')
+
+        list = CourseCategory(courseCategory=courseCategory, description=description)
+        list.save()
+
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+    else:
+        print("nonononon!!!!!!")
+
+
