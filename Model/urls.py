@@ -9,7 +9,12 @@ urlpatterns = [
     url(r'^courseModify', courseModify),
     url(r'^courseDelete', courseDelete),
     url(r'^courseAdd', courseAdd),
-
-
-
+    url(r'^subject', subject),
+    url(r'^subMod', subMod),
+    url(r'^subDel', subDel),
+    url(r'^subAdd', subAdd),
+    url(r'^spe_sub', spe_sub),
+    url(r'^speAdd', speAdd),
+    url(r'^speMod', speMod),
+    url(r'^speDel', spebDel)
 ]

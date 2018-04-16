@@ -3,6 +3,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+
 from Model.models import *
 import json
 
@@ -15,6 +16,7 @@ def hello(request):
 
 def base(request):
     return render(request, 'base.html')
+
 
 #课程信息
 @csrf_exempt
@@ -92,6 +94,120 @@ def courseDelete(req):
         print("keyi shanchu")
         id = req.POST.get('id')
         Course.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+# 学科
+@csrf_exempt
+def subject(request):
+    if request.method == 'GET':
+        data = {}
+        subject = Disciplines.objects.all()
+        subjectlist = []
+        for c in subject:
+            subInfo = {}
+            subInfo['id'] = c.id
+            subInfo['name'] = c.subjectName
+            subInfo['desc'] = c.subjectDes
+            subjectlist.append(subInfo)
+        data['list'] = subjectlist
+        return render(request, 'subject.html', data)
+
+
+# 学科信息-修改
+@csrf_exempt
+def subMod(request):
+    if request.method == 'POST':
+        print("adfa")
+        subjectName = request.POST.get('subjectName')
+        subjectDesc = request.POST.get('subjectDesc')
+        subid = request.POST.get('id')
+        Disciplines.objects.filter(id=subid).update(subjectName=subjectName, subjectDes=subjectDesc)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@csrf_exempt
+def subAdd(request):
+    if request.method == "POST":
+        subjectName = request.POST.get('subjectName')
+        subjectDesc = request.POST.get('subjectDesc')
+        subjectId = request.POST.get('subjectId')
+
+        courselist = Disciplines(id=subjectId, subjectName=subjectName, subjectDes=subjectDesc)
+        courselist.save()
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# 学科信息-删除
+@csrf_exempt
+def subDel(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        Disciplines.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+# 专业
+@csrf_exempt
+def spe_sub(request):
+    if request.method == 'GET':
+        data = {}
+        spe_sub = SpecializedSubject.objects.all()
+        spe_sublist = []
+        for c in spe_sub:
+            subInfo = {}
+            subInfo['id'] = c.id
+            subInfo['spec_sub'] = c.spec_sub
+            subInfo['subject'] = c.subject
+            subInfo['desc'] = c.desc
+            spe_sublist.append(subInfo)
+        data['list'] = spe_sublist
+        return render(request, 'specializedsubject.html', data)
+
+
+# zhuanye信息-修改
+@csrf_exempt
+def speMod(request):
+    if request.method == 'POST':
+        subjectName = request.POST.get('subjectName')
+        desc = request.POST.get('desc')
+        speId = request.POST.get('id')
+        speName = request.POST.get('speName')
+        print(desc)
+        print(speId)
+        SpecializedSubject.objects.filter(id=speId).update(subject=subjectName, desc=desc, spec_sub=speName)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@csrf_exempt
+def speAdd(request):
+    if request.method == "POST":
+        subjectName = request.POST.get('subjectName')
+        speDesc = request.POST.get('speDesc')
+        speId = request.POST.get('speId')
+        speName = request.POST.get('speName')
+
+        spelist = SpecializedSubject(id=speId, subject=subjectName, desc=speDesc, spec_sub=speName)
+        spelist.save()
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# zhuanye信息-删除
+@csrf_exempt
+def spebDel(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        SpecializedSubject.objects.filter(id=id).delete()
         data = {}
         data['result'] = 'post_success'
         data['id'] = id

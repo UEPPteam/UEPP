@@ -11,3 +11,19 @@ class Course(models.Model):
     introduction = models.CharField(max_length=180)
     pCourseId = models.CharField(max_length=20)
     boundCourseId = models.CharField(max_length=20)
+
+
+class Disciplines(models.Model):
+    subjectName = models.CharField(max_length=20)
+    subjectDes = models.CharField(max_length=512)
+
+
+class SpecializedSubject(models.Model):
+    spec_sub = models.CharField(max_length=20)
+    subject = models.CharField(max_length=20)
+    desc = models.CharField(max_length=512)
+
+
+class CoursesInDisciplines(models.Model):
+    subject = models.CharField(max_length=20)
+    course = models.CharField(max_length=20)

@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+           基础信息 > 专业
+            <span class="smart-widget-option">
+
+            </span>
+        </div>
+        <!-- add-->
+		<div class="modal fade" id="formInModal" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">添加新专业</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="speId">专业编号</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="speId" placeholder="请输入专业编号">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="speName">专业名称</label>
+                                 <div class="col-sm-8">
+                                     <input class="form-control" id="speName" placeholder="请输入专业名称">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="subjectName">学科名称</label>
+                                 <div class="col-sm-8">
+                                     <input class="form-control" id="subjectName" placeholder="请输入学科名称">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="speDesc">描述</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="speDesc" placeholder="请输入专业描述">
+                                </div>
+				  			</div>
+		        		</form>
+                        <a id='add'class="btn btn-danger block m-top-md">添加</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- modify-->
+		<div class="modal fade" id="modify" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">修改专业信息</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='addform' method="post" role="form" class="form-horizontal">
+                            <input id="modid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="speName">专业名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modSpeName" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="subjectName">学科名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modSubjectName" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="speDesc">描述</label>
+                                 <div class="col-sm-8">
+                                     <input  class="form-control" id="modSpeDesc" placeholder="">
+                                 </div>
+                            </div>
+		        		</form>
+                        <a id='modSpe' class="btn btn-danger block m-top-md">修改</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <div class="smart-widget-inner">
+            <div class="smart-widget-body">
+                <p>专业  <input> <button class="btn btn-info btn-xs">查询</button> <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加</button></p>
+                <p>经管学院专业列表</p>
+                <table class="table table-bordered" id="usertable">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>专业</th>
+                        <th>学科</th>
+                        <th>描述</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in list %}
+                        <tr id="{{ i.id }}">
+                            <td width="50" id="{{ i.id }}">{{ i.id }}</td>
+                            <td width="100">{{ i.spec_sub }}</td>
+                            <td width="100">{{ i.subject }}</td>
+                            <td width="500">{{ i.desc }}</td>
+                            <td width="100">
+                                <button class="btn btn-info btn-xs xiugai">编辑</button>
+                                <button class="btn btn-info btn-xs del">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+        $('#add').on('click',function(){
+            var subjectName = $('#subjectName').val();
+            var speDesc = $('#speDesc').val();
+            var speName = $('#speName').val();
+            var speId = $('#speId').val();
+            if(subjectName==''){
+                $("#subjectName").focus();
+            }else if(speDesc==''){
+                $("#speDesc").focus();
+            }else if(speName==''){
+                $("#speName").focus();
+            }else if(speId==''){
+                $("#speId").focus();
+            }else{
+                var data = {}
+                data['subjectName']=subjectName;
+                data['speId']=speId;
+                data['speDesc']=speDesc;
+                data['speName']=speName;
+                $.ajax({
+                    url: '/Model/speAdd',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result == "post_success" ) {
+                            window.location.reload();
+                        }else {
+                            alert('未成功');
+                        }
+                    }
+                })
+            }
+        });
+        $('.xiugai').on('click',function (){
+            var tr = $(this).parents("tr");
+            var subjectName = tr.children("td").eq(2).text();
+            var desc = tr.children("td").eq(3).text();
+            var speId = tr.children("td").eq(0).text();
+            var speName = tr.children("td").eq(1).text();
+            $('#modSubjectName').val(subjectName);
+            $('#modSpeDesc').val(desc);
+            $('#modid').val(speId);
+            $('#modSpeName').val(speName);
+            $("#modify").modal();
+        });
+        $('#modSpe').on('click',function () {
+            var subjectName = $('#modSubjectName').val();
+            var desc = $('#modSpeDesc').val();
+            var speName = $('#modSpeName').val();
+            var id = $('#modid').val();
+            if(subjectName==''){
+                $("#modSubjectName").focus();
+            }else if(desc==''){
+                $("#modSpeDesc").focus();
+            }else if(speName==''){
+                $("#modSpeName").focus();
+            }else{
+                var data = {};
+                data['subjectName'] = subjectName;
+                data['desc']= desc;
+                data['speName'] = speName;
+                data['id'] = id;
+                console.log(data);
+                $.ajax({
+                    url: '/Model/speMod',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.reload();
+                        } else {
+                            alert('修改未成功');
+                        }
+                    }
+                });
+            }
+        });
+        $('.del').on('click',function () {
+            var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
+            if (r==true) {
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
+                console.log(id);
+                $.ajax({
+                    url: '/Model/speDel',
+                    type: 'POST',
+                    data: {id: id},
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result.result == "post_success") {
+                            document.getElementById(result.id).remove();
+                        } else {
+                            alert('删除未成功');
+                        }
+                    }
+                });
+            }
+        })
+
+    </script>
+{% endblock %}
