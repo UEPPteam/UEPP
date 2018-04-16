@@ -213,6 +213,7 @@ def spebDel(req):
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
+
 #课程模块信息
 @csrf_exempt
 def courseModule(request):
@@ -305,3 +306,216 @@ def courseCategoryAdd(request):
         print("nonononon!!!!!!")
 
 
+#
+@csrf_exempt
+def course_dis(request):
+    if request.method == 'GET':
+        data = {}
+        cd = CoursesInDisciplines.objects.all()
+        cdlist = []
+        for c in cd:
+            subInfo = {}
+            subInfo['id'] = c.id
+            subInfo['subject'] = c.subject
+            subInfo['course'] = c.course
+            cdlist.append(subInfo)
+        data['list'] = cdlist
+        return render(request, 'course_dis.html', data)
+
+
+# pingtaike信息-修改
+@csrf_exempt
+def cdMod(request):
+    if request.method == 'POST':
+        subject = request.POST.get('subName')
+        cdId = request.POST.get('id')
+        courseName = request.POST.get('courseName')
+        CoursesInDisciplines.objects.filter(id=cdId).update(subject=subject, course=courseName)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@csrf_exempt
+def cdAdd(request):
+    if request.method == "POST":
+        subName = request.POST.get('subName')
+        cdId = request.POST.get('cdId')
+        courseName = request.POST.get('courseName')
+
+        cdlist = CoursesInDisciplines(id=cdId, subject=subName, course=courseName)
+        cdlist.save()
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# pingtaike信息-删除
+@csrf_exempt
+def cdDel(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        CoursesInDisciplines.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+#
+@csrf_exempt
+def spec_course(request):
+    if request.method == 'GET':
+        data = {}
+        sc = CoreCoursesInSpecializedSubject.objects.all()
+        sclist = []
+        for c in sc:
+            subInfo = {}
+            subInfo['id'] = c.id
+            subInfo['spec'] = c.spec_sub
+            subInfo['course'] = c.course
+            sclist.append(subInfo)
+        data['list'] = sclist
+        return render(request, 'spec_course.html', data)
+
+
+# pingtaike信息-修改
+@csrf_exempt
+def scMod(request):
+    if request.method == 'POST':
+        spe = request.POST.get('speName')
+        scId = request.POST.get('id')
+        courseName = request.POST.get('courseName')
+        CoreCoursesInSpecializedSubject.objects.filter(id=scId).update(spec_sub=spe, course=courseName)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@csrf_exempt
+def scAdd(request):
+    if request.method == "POST":
+        speName = request.POST.get('speName')
+        scId = request.POST.get('scId')
+        courseName = request.POST.get('courseName')
+
+        sclist = CoreCoursesInSpecializedSubject(id=scId, spec_sub=speName, course=courseName)
+        sclist.save()
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# pingtaike信息-删除
+@csrf_exempt
+def scDel(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        CoreCoursesInSpecializedSubject.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+#
+@csrf_exempt
+def elec_course(request):
+    if request.method == 'GET':
+        data = {}
+        print("saf")
+        sc = ElectiveCoursesInSpecializedSubject.objects.all()
+        sclist = []
+        for c in sc:
+            subInfo = {}
+            subInfo['id'] = c.id
+            subInfo['spec'] = c.spec_sub
+            subInfo['course'] = c.course
+            sclist.append(subInfo)
+        data['list'] = sclist
+        return render(request, 'elec_course.html', data)
+
+
+# 信息-修改
+@csrf_exempt
+def ecMod(request):
+    if request.method == 'POST':
+        spe = request.POST.get('subName')
+        scId = request.POST.get('id')
+        courseName = request.POST.get('courseName')
+        ElectiveCoursesInSpecializedSubject.objects.filter(id=scId).update(spec_sub=spe, course=courseName)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@csrf_exempt
+def ecAdd(request):
+    if request.method == "POST":
+        speName = request.POST.get('subName')
+        scId = request.POST.get('cdId')
+        courseName = request.POST.get('courseName')
+
+        sclist = ElectiveCoursesInSpecializedSubject(id=scId, spec_sub=speName, course=courseName)
+        sclist.save()
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# pingtaike信息-删除
+@csrf_exempt
+def ecDel(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        ElectiveCoursesInSpecializedSubject.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+#
+@csrf_exempt
+def e_course(request):
+    if request.method == 'GET':
+        data = {}
+        print("saf")
+        sc = ElectiveCourses.objects.all()
+        sclist = []
+        for c in sc:
+            subInfo = {}
+            subInfo['id'] = c.id
+            subInfo['course'] = c.course
+            sclist.append(subInfo)
+        data['list'] = sclist
+        return render(request, 'e_course.html', data)
+
+
+# 信息-修改
+@csrf_exempt
+def eecMod(request):
+    if request.method == 'POST':
+        scId = request.POST.get('id')
+        courseName = request.POST.get('courseName')
+        ElectiveCourses.objects.filter(id=scId).update(course=courseName)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@csrf_exempt
+def eecAdd(request):
+    if request.method == "POST":
+        scId = request.POST.get('cdId')
+        courseName = request.POST.get('courseName')
+
+        sclist = ElectiveCourses(id=scId, course=courseName)
+        sclist.save()
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# 信息-删除
+@csrf_exempt
+def eecDel(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        ElectiveCourses.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')

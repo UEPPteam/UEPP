@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+           基础信息 > 专业核心课
+            <span class="smart-widget-option">
+
+            </span>
+        </div>
+        <!-- add-->
+		<div class="modal fade" id="formInModal" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">添加新专业核心课</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="scId">专业核心课编号</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="scId" placeholder="请输入专业核心课编号">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="speName">专业名称</label>
+                                 <div class="col-sm-8">
+                                     <input class="form-control" id="speName" placeholder="请输入专业名称">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="courseName">课程名称</label>
+                                 <div class="col-sm-8">
+                                     <input class="form-control" id="courseName" placeholder="请输入课程名称">
+                                 </div>
+                            </div>
+		        		</form>
+                        <a id='add'class="btn btn-danger block m-top-md">添加</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- modify-->
+		<div class="modal fade" id="modify" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">修改专业核心课信息</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='addform' method="post" role="form" class="form-horizontal">
+                            <input id="modid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="speName">专业名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modSpeName" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modCourseName" placeholder="">
+                                </div>
+				  			</div>
+		        		</form>
+                        <a id='modsc' class="btn btn-danger block m-top-md">修改</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <div class="smart-widget-inner">
+            <div class="smart-widget-body">
+                <p>学科  <input> 课程<input><button class="btn btn-info btn-xs">查询</button> <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加</button></p>
+                <p>经管学院专业核心课列表</p>
+                <table class="table table-bordered" id="usertable">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>专业</th>
+                        <th>课程</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in list %}
+                        <tr id="{{ i.id }}">
+                            <td width="50" id="{{ i.id }}">{{ i.id }}</td>
+                            <td width="100">{{ i.spec }}</td>
+                            <td width="100">{{ i.course }}</td>
+                            <td width="100">
+                                <button class="btn btn-info btn-xs xiugai">编辑</button>
+                                <button class="btn btn-info btn-xs del">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+        $('#add').on('click',function(){
+            var courseName = $('#courseName').val();
+            var speName = $('#speName').val();
+            var scId = $('#scId').val();
+            if(speName==''){
+                $("#speName").focus();
+            }else if(courseName==''){
+                $("#courseName").focus();
+            }else if(scId==''){
+                $("#scId").focus();
+            }else{
+                var data = {}
+                data['speName']=speName;
+                data['scId']=scId;
+                data['courseName']=courseName;
+                $.ajax({
+                    url: '/Model/scAdd',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result == "post_success" ) {
+                            window.location.reload();
+                        }else {
+                            alert('未成功');
+                        }
+                    }
+                })
+            }
+        });
+        $('.xiugai').on('click',function (){
+            var tr = $(this).parents("tr");
+            var speName = tr.children("td").eq(1).text();
+            var scId = tr.children("td").eq(0).text();
+            var courseName = tr.children("td").eq(2).text();
+            $('#modSpeName').val(speName);
+            $('#modCourseName').val(courseName);
+            $('#modid').val(scId);
+            $("#modify").modal();
+        });
+        $('#modsc').on('click',function () {
+            var speName = $('#modSpeName').val();
+            var courseName = $('#modCourseName').val();
+            var id = $('#modid').val();
+            if(speName==''){
+                $("#modSpeName").focus();
+            }else if(courseName==''){
+                $("#modCourseName").focus();
+            }else{
+                var data = {};
+                data['speName'] = speName;
+                data['courseName'] = courseName;
+                data['id'] = id;
+                console.log(data);
+                $.ajax({
+                    url: '/Model/scMod',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.reload();
+                        } else {
+                            alert('修改未成功');
+                        }
+                    }
+                });
+            }
+        });
+        $('.del').on('click',function () {
+            var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
+            if (r==true) {
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
+                console.log(id);
+                $.ajax({
+                    url: '/Model/scDel',
+                    type: 'POST',
+                    data: {id: id},
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result.result == "post_success") {
+                            document.getElementById(result.id).remove();
+                        } else {
+                            alert('删除未成功');
+                        }
+                    }
+                });
+            }
+        })
+
+    </script>
+{% endblock %}

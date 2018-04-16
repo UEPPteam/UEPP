@@ -26,4 +26,20 @@ urlpatterns = [
     #课程种类
     url(r'^courseCategory', courseCategory),
     url(r'^courseCategoryAdd', courseCategoryAdd),
+    url(r'^course_dis', course_dis),
+    url(r'^cdAdd', cdAdd),
+    url(r'^cdMod', cdMod),
+    url(r'^cdDel', cdDel),
+    url(r'^spec_course', spec_course),
+    url(r'^scAdd', scAdd),
+    url(r'^scMod', scMod),
+    url(r'^scDel', scDel),
+    url(r'^elec_course', elec_course),
+    url(r'^ecAdd', ecAdd),
+    url(r'^ecMod', ecMod),
+    url(r'^ecDel', ecDel),
+    url(r'^e_course', e_course),
+    url(r'^eecAdd', eecAdd),
+    url(r'^eecMod', eecMod),
+    url(r'^eecDel', eecDel)
 ]
