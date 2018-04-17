@@ -41,7 +41,7 @@ urlpatterns = [
     url(r'^e_course', e_course),
     url(r'^eecAdd', eecAdd),
     url(r'^eecMod', eecMod),
-    url(r'^eecDel', eecDel)
+    url(r'^eecDel', eecDel),
     url(r'^courseCategory/', courseCategory),
     url(r'^courseCategoryAdd/', courseCategoryAdd),
     url(r'^courseCategoryModify/', courseCategoryModify),

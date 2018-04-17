@@ -38,7 +38,6 @@ class CourseModule(models.Model):
 class CourseCategory(models.Model):
     courseCategory = models.CharField(max_length=45)
     description = models.CharField(max_length=180)
-    course = models.CharField(max_length=20)
 
 
 class CoreCoursesInSpecializedSubject(models.Model):
