@@ -53,3 +53,35 @@ class ElectiveCoursesInSpecializedSubject(models.Model):
 
 class ElectiveCourses(models.Model):
     course = models.CharField(max_length=20)
+
+
+class Courses(models.Model):
+    courseId = models.CharField(max_length=10)
+    courseName = models.CharField(max_length=128)
+    courseEngName = models.CharField(max_length=128)
+    credit = models.FloatField(max_length=12)
+    creditHour = models.IntegerField()
+    theoryCreditHour = models.IntegerField()
+    experimentCreditHour = models.IntegerField()
+    practiceCreditHour = models.IntegerField()
+    #courseModule = models.ForeignKey('CourseModule', on_delete=models.CASCADE)
+    #courseCategory = models.ForeignKey('CourseCategory', on_delete=models.CASCADE)
+    courseModule = models.CharField(max_length=45)
+    courseCategory = models.CharField(max_length=45)
+    courseAttribution = models.CharField(max_length=45)
+    isSchoolCourse = models.CharField(max_length=10)
+    isCollegeCourse = models.CharField(max_length=10)
+
+class CoursePrevious(models.Model):
+    courseName = models.CharField(max_length=128)
+    pCourseName = models.CharField(max_length=128)
+
+class EducationOverview(models.Model):
+    year = models.IntegerField()
+    desc = models.CharField(max_length=180)
+    status = models.CharField(max_length=45)
+
+class EducationMajor(models.Model):
+    year = models.IntegerField()
+    majorName = models.CharField(max_length=128)
+

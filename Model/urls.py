@@ -42,4 +42,30 @@ urlpatterns = [
     url(r'^eecAdd', eecAdd),
     url(r'^eecMod', eecMod),
     url(r'^eecDel', eecDel)
+    url(r'^courseCategory/', courseCategory),
+    url(r'^courseCategoryAdd/', courseCategoryAdd),
+    url(r'^courseCategoryModify/', courseCategoryModify),
+    url(r'^courseCategoryDelete/', courseCategoryDelete),
+    #课程
+    url(r'^courses/', courses),
+    url(r'^coursesAdd/', coursesAdd),
+    url(r'^coursesModify/', coursesModify),
+    url(r'^coursesDelete/', coursesDelete),
+    #先行课
+    url(r'^coursePrevious/', coursePrevious),
+    url(r'^coursePreviousAdd/', coursePreviousAdd),
+    url(r'^coursePreviousModify/', coursePreviousModify),
+    url(r'^coursePreviousDelete/', coursePreviousDelete),
+
+#培养方案
+    #版本
+    url(r'^educationOverview/', educationOverview),
+    url(r'^educationOverviewAdd/', educationOverviewAdd),
+    url(r'^educationOverviewModify/', educationOverviewModify),
+    url(r'^educationOverviewDelete/', educationOverviewDelete),
+    #专业
+    url(r'^educationMajor/', educationMajor),
+    url(r'^educationMajorAdd/', educationMajorAdd),
+    url(r'^educationMajorModify/', educationMajorModify),
+    url(r'^educationMajorDelete/', educationMajorDelete),
 ]

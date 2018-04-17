@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-           基础数据 > 课程模块
+           培养方案 > 版本 > 专业
             <span class="smart-widget-option">
                 <a href="#" class="widget-collapse-option" data-toggle="collapse">
                     <i class="fa fa-chevron-up"></i>
@@ -16,20 +16,20 @@
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">添加课程模块</h4>
+		        		<h4 class="modal-title" id="myModalLabel">新增方案专业</h4>
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
 				  			<div class="form-group">
-				    			<label class="control-label col-sm-3" for="courseModule">课程模块</label>
+				    			<label class="control-label col-sm-3" for="year">年度</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="courseModule" placeholder="请输入课程模块">
+                                    <input class="form-control" id="year" placeholder="请输入年度">
                                 </div>
 				  			</div>
                             <div class="form-group">
-							    <label class="control-label col-sm-3" for="description">描述</label>
+							    <label class="control-label col-sm-3" for="majorName">专业名称</label>
                                  <div class="col-sm-8">
-                                     <input  class="form-control" id="description" placeholder="请输入课程描述">
+                                     <input class="form-control" id="majorName" placeholder="请输入专业名称">
                                  </div>
                             </div>
 		        		</form>
@@ -39,7 +39,7 @@
 		  	</div>
 		</div>
         <!-- modify-->
-		<div class="modal fade" id="modify" aria-hidden="true">
+		{% comment %}<div class="modal fade" id="modify" aria-hidden="true">
 		  	<div class="modal-dialog modal-sm">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -66,7 +66,7 @@
 		      		</div>
 		    	</div>
 		  	</div>
-		</div>
+		</div>{% endcomment %}
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
                 <ul class="widget-color-list clearfix">
@@ -84,33 +84,36 @@
             </div>
             <div class="smart-widget-body">
                 <table style="border: 0px solid transparent !important;" aligh="center">
-                    <td width="60"><h5>课程模块</h5></td>
+                    <td width="60"><h5>专业</h5></td>
                     <td width="300"><input type="text" class="form-control">{% comment %}<span class="input-group-btn">
                         <button class="btn btn-default" type="button">Go!</button>
                     </span>{% endcomment %}</td>
                     <td width="200"><button class="btn btn-info btn-xs" style="padding:3px">查询</button></td>
-                    <td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加</button></td>
+                    <td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">新增方案专业</button></td>
                 </table>
             <br/>
                 <table class="table table-bordered" id="usertable">
                     <thead>
                     <tr>
                         <th>ID</th>
-                        <th>课程模块</th>
-                        <th>描述</th>
+                        <th>专业</th>
+                        <th>培养方案详细（表格）</th>
+                        <th>培养方案详细（图形）</th>
+                        <th>评价</th>
                         <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in courseModuleList %}
+                    {% for i in eduMajorList %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.courseModule }}</td>
-                            <td>{{ i.description }}</td>
+                            <td>{{ i.majorName }}</td>
+                            <td><button class="btn btn-info btn-xs formdetail">表格</button></td>
+                            <td><button class="btn btn-info btn-xs graphdetail">图形</button></td>
+                            <td><button class="btn btn-info btn-xs pingjia">评价</button></td>
                             <td>
-                                <button class="btn btn-info btn-xs xiugai">修改</button>
+                                <button class="btn btn-info btn-xs xiugai">编辑</button>
                                 <button class="btn btn-info btn-xs del">删除</button>
-
                             </td>
                         </tr>
                     {% endfor %}
@@ -125,16 +128,18 @@
     <script type="text/javascript">
 
         $('#add').on('click',function(){
-            var courseModule = $('#courseModule').val();
-            var description = $('#description').val();
-            if(courseModule==''){
-                $("#courseModule").focus();
+            var year = $('#year').val();
+            var majorName = $('#majorName').val();
+            if(year==''){
+                $("#year").focus();
+            }else if(majorName==''){
+                $("#majorName").focus();
             }else{
                 var data = {}
-                data['courseModule']=courseModule;
-                data['description']=description;
+                data['year']=year;
+                data['majorName']=majorName;
                 $.ajax({
-                    url: '/Model/courseModuleAdd/',
+                    url: '/Model/educationMajorAdd/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
@@ -187,12 +192,12 @@
             }
         })
         $('.del').on('click',function () {
-            var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
+            var r=confirm("警告：您确定要删除此专业方案吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
                 var id = tr.attr("id");
                 $.ajax({
-                    url: '/Model/courseModuleDelete/',
+                    url: '/Model/educationMajorDelete/',
                     type: 'POST',
                     data: {id: id},
                     dataType: 'json',

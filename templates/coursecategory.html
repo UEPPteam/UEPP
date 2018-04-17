@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-           基础数据 > 课程模块
+           基础数据 > 课程类别
             <span class="smart-widget-option">
                 <a href="#" class="widget-collapse-option" data-toggle="collapse">
                     <i class="fa fa-chevron-up"></i>
@@ -16,20 +16,20 @@
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">添加课程模块</h4>
+		        		<h4 class="modal-title" id="myModalLabel">添加课程类别</h4>
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
 				  			<div class="form-group">
-				    			<label class="control-label col-sm-3" for="courseModule">课程模块</label>
+				    			<label class="control-label col-sm-3" for="courseCategory">课程类别</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="courseModule" placeholder="请输入课程模块">
+                                    <input class="form-control" id="courseCategory" placeholder="请输入课程类别">
                                 </div>
 				  			</div>
                             <div class="form-group">
 							    <label class="control-label col-sm-3" for="description">描述</label>
                                  <div class="col-sm-8">
-                                     <input  class="form-control" id="description" placeholder="请输入课程描述">
+                                     <input class="form-control" id="description" placeholder="请输入课程描述">
                                  </div>
                             </div>
 		        		</form>
@@ -44,21 +44,21 @@
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">修改课程模块</h4>
+		        		<h4 class="modal-title" id="myModalLabel">修改课程类别</h4>
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='addform' method="post" role="form" class="form-horizontal">
                             <input id="modid" type="hidden">
 				  			<div class="form-group">
-				    			<label class="control-label col-sm-3" for="courseModule">课程模块</label>
+				    			<label class="control-label col-sm-3" for="courseCategory">课程类别</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="modCourseModule" placeholder="">
+                                    <input class="form-control" id="modCourseCategory" placeholder="">
                                 </div>
 				  			</div>
                             <div class="form-group">
 							    <label class="control-label col-sm-3" for="description">描述</label>
                                  <div class="col-sm-8">
-                                     <input  class="form-control" id="modDescription" placeholder="请输入课程描述">
+                                     <input  class="form-control" id="modDescription" placeholder="请输入描述">
                                  </div>
                             </div>
 		        		</form>
@@ -84,7 +84,7 @@
             </div>
             <div class="smart-widget-body">
                 <table style="border: 0px solid transparent !important;" aligh="center">
-                    <td width="60"><h5>课程模块</h5></td>
+                    <td width="60"><h5>课程类别</h5></td>
                     <td width="300"><input type="text" class="form-control">{% comment %}<span class="input-group-btn">
                         <button class="btn btn-default" type="button">Go!</button>
                     </span>{% endcomment %}</td>
@@ -96,16 +96,16 @@
                     <thead>
                     <tr>
                         <th>ID</th>
-                        <th>课程模块</th>
+                        <th>课程类别</th>
                         <th>描述</th>
                         <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in courseModuleList %}
+                    {% for i in courseCategoryList %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.courseModule }}</td>
+                            <td>{{ i.courseCategory }}</td>
                             <td>{{ i.description }}</td>
                             <td>
                                 <button class="btn btn-info btn-xs xiugai">修改</button>
@@ -125,16 +125,16 @@
     <script type="text/javascript">
 
         $('#add').on('click',function(){
-            var courseModule = $('#courseModule').val();
+            var courseCategory = $('#courseCategory').val();
             var description = $('#description').val();
-            if(courseModule==''){
-                $("#courseModule").focus();
+            if(courseCategory==''){
+                $("#courseCategory").focus();
             }else{
                 var data = {}
-                data['courseModule']=courseModule;
+                data['courseCategory']=courseCategory;
                 data['description']=description;
                 $.ajax({
-                    url: '/Model/courseModuleAdd/',
+                    url: '/Model/courseCategoryAdd/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
@@ -152,26 +152,26 @@
         $('.xiugai').on('click',function (){
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
-            var courseModule = tr.children("td").eq(1).text();
+            var courseCategory = tr.children("td").eq(1).text();
             var description = tr.children("td").eq(2).text();
 
-            $('#modCourseModule').val(courseModule);
+            $('#modCourseCategory').val(courseCategory);
             $('#modDescription').val(description);
             $("#modid").val(id);
             $("#modify").modal();
         });
         $('#mod').on('click',function () {
-            var courseModule = $('#modCourseModule').val();
+            var courseCategory = $('#modCourseCategory').val();
             var description = $('#modDescription').val();
-            if(courseModule==''){
-                $("#modCourseModule").focus();
+            if(courseCategory==''){
+                $("#modCourseCategory").focus();
             }else{
                 var data = {};
                 data['id'] = $("#modid").val();
-                data['courseModule']=courseModule;
+                data['courseCategory']=courseCategory;
                 data['description']=description;
                 $.ajax({
-                    url: '/Model/courseModuleModify/',
+                    url: '/Model/courseCategoryModify/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
@@ -187,12 +187,12 @@
             }
         })
         $('.del').on('click',function () {
-            var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
+            var r=confirm("警告：您确定要删除此课程类别吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
                 var id = tr.attr("id");
                 $.ajax({
-                    url: '/Model/courseModuleDelete/',
+                    url: '/Model/courseCategoryDelete/',
                     type: 'POST',
                     data: {id: id},
                     dataType: 'json',
