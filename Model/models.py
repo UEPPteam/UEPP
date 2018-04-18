@@ -23,7 +23,7 @@ class SpecializedSubject(models.Model):
     spec_sub = models.CharField(max_length=20)
     subject = models.CharField(max_length=20)
     desc = models.CharField(max_length=512)
-
+    courseList = models.CharField(max_length=512)
 
 class CoursesInDisciplines(models.Model):
     subject = models.CharField(max_length=20)

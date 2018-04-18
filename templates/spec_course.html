@@ -22,9 +22,9 @@
                                 <div class="col-sm-8">
 {#                                    <input class="form-control" id="scId" placeholder="请输入专业核心课编号">#}
                                     <select class="form-control" id="scId">
-                                        {% for c in course %}
-                                            <option value="{{ c.id }}">{{ c.id }}</option>
-                                        {% endfor %}
+{#                                        {% for c in course %}#}
+{#                                            <option value="{{ c.id }}">{{ c.id }}</option>#}
+{#                                        {% endfor %}#}
                                     </select>
                                 </div>
 				  			</div>
@@ -33,6 +33,7 @@
                                  <div class="col-sm-8">
 {#                                     <input class="form-control" id="speName" placeholder="请输入专业名称">#}
                                      <select class="form-control" id="speName">
+                                     <option value=""></option>
                                          {% for s in spe %}
                                              <option value="{{ s }}">{{ s }}</option>
                                          {% endfor %}
@@ -44,9 +45,9 @@
                                  <div class="col-sm-8">
 {#                                     <input class="form-control" id="courseName" placeholder="请输入课程名称">#}
                                      <select class="form-control" id="courseName">
-                                         {% for c in course %}
-                                             <option value="{{ c.name }}">{{ c.name }}</option>
-                                         {% endfor %}
+{#                                         {% for c in course %}#}
+{#                                             <option value="{{ c.name }}">{{ c.name }}</option>#}
+{#                                         {% endfor %}#}
                                      </select>
                                  </div>
                             </div>
@@ -67,6 +68,7 @@
 		      		<div class="modal-body">
 		        		<form  id='addform' method="post" role="form" class="form-horizontal">
                             <input id="modid" type="hidden">
+                            <input id="orispe" type="hidden">
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="speName">专业名称</label>
                                 <div class="col-sm-8">
@@ -83,9 +85,9 @@
                                 <div class="col-sm-8">
 {#                                    <input class="form-control" id="modCourseName" placeholder="">#}
                                     <select class="form-control" id="modCourseName">
-                                         {% for c in course %}
-                                             <option value="{{ c }}">{{ c }}</option>
-                                         {% endfor %}
+{#                                         {% for c in course %}#}
+{#                                             <option value="{{ c }}">{{ c }}</option>#}
+{#                                         {% endfor %}#}
                                      </select>
                                 </div>
 				  			</div>
@@ -128,6 +130,7 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
+        var sslist = {{ sslist | safe }}
         $('#add').on('click',function(){
             var courseName = $('#courseName').val();
             var speName = $('#speName').val();
@@ -167,6 +170,15 @@
             $('#modSpeName').val(speName);
             $('#modCourseName').val(courseName);
             $('#modid').val(scId);
+            $('#orispe').val(speName);
+            var sn = $('#modSpeName').val();
+            var l = sslist[sn];
+            var nm = $('#modCourseName');
+            nm.empty();
+            for(var i=0; i<l.length; i++){
+                var name = c[l[i]];
+                nm.append("<option value='" + name + "'>" + name + "</option>");
+            }
             $("#modify").modal();
         });
         $('#modsc').on('click',function () {
@@ -182,6 +194,7 @@
                 data['speName'] = speName;
                 data['courseName'] = courseName;
                 data['id'] = id;
+                data['orispe']=$('#orispe').val();
                 console.log(data);
                 $.ajax({
                     url: '/Model/scMod',
@@ -203,12 +216,13 @@
             var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
-                var id = tr.attr("id");
+                var id = tr.children("td").eq(0).text();
+                var speName = tr.children("td").eq(1).text();
                 console.log(id);
                 $.ajax({
                     url: '/Model/scDel',
                     type: 'POST',
-                    data: {id: id},
+                    data: {id: id, spe: speName},
                     dataType: 'json',
                     timeout: 10000,
                     success: function (result) {
@@ -228,6 +242,29 @@
         })
         $('#courseName').change(function () {
             $('#scId').val(c[$(this).val()])
+        })
+        $('#speName').change(function () {
+            var sn = $('#speName').val();
+            var l = sslist[sn];
+            var id = $('#scId');
+            var nm = $('#courseName');
+            id.empty();
+            nm.empty();
+            for(var i=0; i<l.length; i++){
+                var name = c[l[i]];
+                id.append("<option value='" + l[i] + "'>" + l[i] + "</option>");
+                nm.append("<option value='" + name + "'>" + name + "</option>");
+            }
+        })
+        $('#modSpeName').change(function () {
+            var sn = $('#modSpeName').val();
+            var l = sslist[sn];
+            var nm = $('#modCourseName');
+            nm.empty();
+            for(var i=0; i<l.length; i++){
+                var name = c[l[i]];
+                nm.append("<option value='" + name + "'>" + name + "</option>");
+            }
         })
     </script>
 {% endblock %}

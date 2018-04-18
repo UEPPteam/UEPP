@@ -31,9 +31,9 @@
                                 <div class="col-sm-8">
 {#                                    <input class="form-control" id="cdId" placeholder="请输入专业选修课编号">#}
                                     <select class="form-control" id="cdId">
-                                        {% for c in course %}
-                                            <option value="{{ c.id }}">{{ c.id }}</option>
-                                        {% endfor %}
+{#                                        {% for c in course %}#}
+{#                                            <option value="{{ c.id }}">{{ c.id }}</option>#}
+{#                                        {% endfor %}#}
                                     </select>
                                 </div>
 				  			</div>
@@ -42,6 +42,7 @@
                                  <div class="col-sm-8">
 {#                                     <input class="form-control" id="subName" placeholder="请输入专业名称">#}
                                      <select class="form-control" id="subName">
+                                     <option value=""></option>
                                          {% for s in spe %}
                                              <option value="{{ s }}">{{ s }}</option>
                                          {% endfor %}
@@ -53,9 +54,9 @@
                                  <div class="col-sm-8">
 {#                                     <input class="form-control" id="courseName" placeholder="请输入课程名称">#}
                                      <select class="form-control" id="courseName">
-                                         {% for c in course %}
-                                             <option value="{{ c.name }}">{{ c.name }}</option>
-                                         {% endfor %}
+{#                                         {% for c in course %}#}
+{#                                             <option value="{{ c.name }}">{{ c.name }}</option>#}
+{#                                         {% endfor %}#}
                                      </select>
                                  </div>
                             </div>
@@ -76,11 +77,12 @@
 		      		<div class="modal-body">
 		        		<form  id='addform' method="post" role="form" class="form-horizontal">
                             <input id="modid" type="hidden">
+                            <input id="orispe" type="hidden">
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="subName">专业名称</label>
                                 <div class="col-sm-8">
 {#                                    <input class="form-control" id="modSubName" placeholder="">#}
-                                    <select class="form-control" id="subName">
+                                    <select class="form-control" id="modSubName">
                                          {% for s in spe %}
                                              <option value="{{ s }}">{{ s }}</option>
                                          {% endfor %}
@@ -91,10 +93,10 @@
 				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
                                 <div class="col-sm-8">
 {#                                    <input class="form-control" id="modCourseName" placeholder="">#}
-                                    <select class="form-control" id="courseName">
-                                         {% for c in course %}
-                                             <option value="{{ c.name }}">{{ c.name }}</option>
-                                         {% endfor %}
+                                    <select class="form-control" id="modCourseName">
+{#                                         {% for c in course %}#}
+{#                                             <option value="{{ c.name }}">{{ c.name }}</option>#}
+{#                                         {% endfor %}#}
                                     </select>
                                 </div>
 				  			</div>
@@ -137,6 +139,7 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
+        var sslist = {{ sslist | safe }}
         $('#add').on('click',function(){
             var courseName = $('#courseName').val();
             var subName = $('#subName').val();
@@ -176,6 +179,15 @@
             $('#modSubName').val(subName);
             $('#modCourseName').val(courseName);
             $('#modid').val(cdId);
+            $('#orispe').val(subName);
+            var sn = subName;
+            var l = sslist[sn];
+            var nm = $('#modCourseName');
+            nm.empty();
+            for(var i=0; i<l.length; i++){
+                var name = c[l[i]];
+                nm.append("<option value='" + name + "'>" + name + "</option>");
+            }
             $("#modify").modal();
         });
         $('#modcd').on('click',function () {
@@ -191,6 +203,7 @@
                 data['subName'] = subName;
                 data['courseName'] = courseName;
                 data['id'] = id;
+                data['orispe'] = $('#orispe').val();
                 console.log(data);
                 $.ajax({
                     url: '/Model/ecMod',
@@ -212,12 +225,13 @@
             var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
-                var id = tr.attr("id");
+                var id = tr.children("td").eq(0).text();
+                var speName = tr.children("td").eq(1).text();
                 console.log(id);
                 $.ajax({
                     url: '/Model/ecDel',
                     type: 'POST',
-                    data: {id: id},
+                    data: {id: id, spe: speName},
                     dataType: 'json',
                     timeout: 10000,
                     success: function (result) {
@@ -237,6 +251,29 @@
         })
         $('#courseName').change(function () {
             $('#cdId').val(c[$(this).val()])
+        })
+        $('#subName').change(function () {
+            var sn = $('#subName').val();
+            var l = sslist[sn];
+            var id = $('#cdId');
+            var nm = $('#courseName');
+            id.empty();
+            nm.empty();
+            for(var i=0; i<l.length; i++){
+                var name = c[l[i]];
+                id.append("<option value='" + l[i] + "'>" + l[i] + "</option>");
+                nm.append("<option value='" + name + "'>" + name + "</option>");
+            }
+        })
+        $('#modSubName').change(function () {
+            var sn = $('#modSubName').val();
+            var l = sslist[sn];
+            var nm = $('#modCourseName');
+            nm.empty();
+            for(var i=0; i<l.length; i++){
+                var name = c[l[i]];
+                nm.append("<option value='" + name + "'>" + name + "</option>");
+            }
         })
     </script>
 {% endblock %}
