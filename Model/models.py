@@ -70,6 +70,8 @@ class Courses(models.Model):
     courseAttribution = models.CharField(max_length=45)
     isSchoolCourse = models.CharField(max_length=10)
     isCollegeCourse = models.CharField(max_length=10)
+    courseType = models.CharField(max_length=20, default="F")
+
 
 class CoursePrevious(models.Model):
     courseName = models.CharField(max_length=128)

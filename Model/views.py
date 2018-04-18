@@ -170,6 +170,11 @@ def spe_sub(request):
             subInfo['desc'] = c.desc
             spe_sublist.append(subInfo)
         data['list'] = spe_sublist
+        subjects = Disciplines.objects.all()
+        sublist = []
+        for s in subjects:
+            sublist.append(s.subjectName)
+        data['subject'] = sublist
         return render(request, 'specializedsubject.html', data)
 
 
@@ -597,6 +602,22 @@ def course_dis(request):
             subInfo['course'] = c.course
             cdlist.append(subInfo)
         data['list'] = cdlist
+        subjects = Disciplines.objects.all()
+        sublist = []
+        for s in subjects:
+            sublist.append(s.subjectName)
+        data['subject'] = sublist
+        t = "F"
+        courses = Courses.objects.filter(courseType=t)
+        clist = []
+        cdic = {}
+        for c in courses:
+            # print(c)
+            clist.append({"name": c.courseName, "id": c.courseId})
+            cdic[c.courseName] = c.courseId
+            cdic[c.courseId] = c.courseName
+        data['course'] = clist
+        data['jcourse'] = json.dumps(cdic)
         return render(request, 'course_dis.html', data)
 
 
@@ -607,7 +628,13 @@ def cdMod(request):
         subject = request.POST.get('subName')
         cdId = request.POST.get('id')
         courseName = request.POST.get('courseName')
-        CoursesInDisciplines.objects.filter(id=cdId).update(subject=subject, course=courseName)
+        # CoursesInDisciplines.objects.filter(id=cdId).update(subject=subject, course=courseName)
+        CoursesInDisciplines.objects.filter(id=cdId).delete()
+        c = Courses.objects.filter(courseName=courseName)[0]
+        cd = CoursesInDisciplines(id=c.courseId, subject=subject, course=courseName)
+        cd.save()
+        Courses.objects.filter(courseId=cdId).update(courseType="F")
+        Courses.objects.filter(courseName=courseName).update(courseType="ptk")
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -618,8 +645,8 @@ def cdAdd(request):
         subName = request.POST.get('subName')
         cdId = request.POST.get('cdId')
         courseName = request.POST.get('courseName')
-
         cdlist = CoursesInDisciplines(id=cdId, subject=subName, course=courseName)
+        Courses.objects.filter(courseId=cdId).update(courseType="ptk")
         cdlist.save()
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
@@ -631,6 +658,7 @@ def cdDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
         CoursesInDisciplines.objects.filter(id=id).delete()
+        Courses.objects.filter(courseId=id).update(courseType="F")
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
@@ -651,17 +679,39 @@ def spec_course(request):
             subInfo['course'] = c.course
             sclist.append(subInfo)
         data['list'] = sclist
+        spe_subs = SpecializedSubject.objects.all()
+        spelist = []
+        for s in spe_subs:
+            spelist.append(s.spec_sub)
+        data['spe'] = spelist
+        t = "F"
+        courses = Courses.objects.filter(courseType=t)
+        clist = []
+        cdic = {}
+        for c in courses:
+            # print(c)
+            clist.append({"name": c.courseName, "id": c.courseId})
+            cdic[c.courseName] = c.courseId
+            cdic[c.courseId] = c.courseName
+        data['course'] = clist
+        data['jcourse'] = json.dumps(cdic)
         return render(request, 'spec_course.html', data)
 
 
-# pingtaike信息-修改
+# hexinke信息-修改
 @csrf_exempt
 def scMod(request):
     if request.method == 'POST':
         spe = request.POST.get('speName')
         scId = request.POST.get('id')
         courseName = request.POST.get('courseName')
-        CoreCoursesInSpecializedSubject.objects.filter(id=scId).update(spec_sub=spe, course=courseName)
+        # CoreCoursesInSpecializedSubject.objects.filter(id=scId).update(spec_sub=spe, course=courseName)
+        CoreCoursesInSpecializedSubject.objects.filter(id=scId).delete()
+        c = Courses.objects.filter(courseName=courseName)[0]
+        sc = CoreCoursesInSpecializedSubject(id=c.courseId, spec_sub=spe, course=courseName)
+        sc.save()
+        Courses.objects.filter(courseId=scId).update(courseType="F")
+        Courses.objects.filter(courseName=courseName).update(courseType="hxk")
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -672,19 +722,20 @@ def scAdd(request):
         speName = request.POST.get('speName')
         scId = request.POST.get('scId')
         courseName = request.POST.get('courseName')
-
         sclist = CoreCoursesInSpecializedSubject(id=scId, spec_sub=speName, course=courseName)
         sclist.save()
+        Courses.objects.filter(courseId=scId).update(courseType="hxk")
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-# pingtaike信息-删除
+# 信息-删除
 @csrf_exempt
 def scDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
         CoreCoursesInSpecializedSubject.objects.filter(id=id).delete()
+        Courses.objects.filter(courseId=id).update(courseType="F")
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
@@ -706,6 +757,22 @@ def elec_course(request):
             subInfo['course'] = c.course
             sclist.append(subInfo)
         data['list'] = sclist
+        spe_subs = SpecializedSubject.objects.all()
+        spelist = []
+        for s in spe_subs:
+            spelist.append(s.spec_sub)
+        data['spe'] = spelist
+        t = "F"
+        courses = Courses.objects.filter(courseType=t)
+        clist = []
+        cdic = {}
+        for c in courses:
+            # print(c)
+            clist.append({"name": c.courseName, "id": c.courseId})
+            cdic[c.courseName] = c.courseId
+            cdic[c.courseId] = c.courseName
+        data['course'] = clist
+        data['jcourse'] = json.dumps(cdic)
         return render(request, 'elec_course.html', data)
 
 
@@ -716,7 +783,13 @@ def ecMod(request):
         spe = request.POST.get('subName')
         scId = request.POST.get('id')
         courseName = request.POST.get('courseName')
-        ElectiveCoursesInSpecializedSubject.objects.filter(id=scId).update(spec_sub=spe, course=courseName)
+        # ElectiveCoursesInSpecializedSubject.objects.filter(id=scId).update(spec_sub=spe, course=courseName)
+        ElectiveCoursesInSpecializedSubject.objects.filter(id=scId).delete()
+        c = Courses.objects.filter(courseName=courseName)[0]
+        ec = ElectiveCoursesInSpecializedSubject(id=c.courseId, spec_sub=spe, course=courseName)
+        ec.save()
+        Courses.objects.filter(courseId=scId).update(courseType="F")
+        Courses.objects.filter(courseName=courseName).update(courseType="zxk")
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -730,6 +803,7 @@ def ecAdd(request):
 
         sclist = ElectiveCoursesInSpecializedSubject(id=scId, spec_sub=speName, course=courseName)
         sclist.save()
+        Courses.objects.filter(courseId=scId).update(courseType="zxk")
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -740,6 +814,7 @@ def ecDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
         ElectiveCoursesInSpecializedSubject.objects.filter(id=id).delete()
+        Courses.objects.filter(courseId=id).update(courseType="F")
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
@@ -760,6 +835,18 @@ def e_course(request):
             subInfo['course'] = c.course
             sclist.append(subInfo)
         data['list'] = sclist
+
+        t = "F"
+        courses = Courses.objects.filter(courseType=t)
+        clist = []
+        cdic = {}
+        for c in courses:
+            # print(c)
+            clist.append({"name": c.courseName, "id": c.courseId})
+            cdic[c.courseName] = c.courseId
+            cdic[c.courseId] = c.courseName
+        data['course'] = clist
+        data['jcourse'] = json.dumps(cdic)
         return render(request, 'e_course.html', data)
 
 
@@ -769,7 +856,12 @@ def eecMod(request):
     if request.method == 'POST':
         scId = request.POST.get('id')
         courseName = request.POST.get('courseName')
-        ElectiveCourses.objects.filter(id=scId).update(course=courseName)
+        ElectiveCourses.objects.filter(id=scId).delete()
+        c = Courses.objects.filter(courseName=courseName)[0]
+        ec = ElectiveCourses(id=c.courseId, course=c.courseName)
+        ec.save()
+        Courses.objects.filter(courseId=scId).update(courseType="F")
+        Courses.objects.filter(courseName=courseName).update(courseType="rxk")
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -782,6 +874,7 @@ def eecAdd(request):
 
         sclist = ElectiveCourses(id=scId, course=courseName)
         sclist.save()
+        Courses.objects.filter(courseId=scId).update(courseType="rxk")
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -792,6 +885,7 @@ def eecDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
         ElectiveCourses.objects.filter(id=id).delete()
+        Courses.objects.filter(courseId=id).update(courseType="F")
         data = {}
         data['result'] = 'post_success'
         data['id'] = id

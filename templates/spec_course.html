@@ -20,19 +20,34 @@
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="scId">专业核心课编号</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="scId" placeholder="请输入专业核心课编号">
+{#                                    <input class="form-control" id="scId" placeholder="请输入专业核心课编号">#}
+                                    <select class="form-control" id="scId">
+                                        {% for c in course %}
+                                            <option value="{{ c.id }}">{{ c.id }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
 				  			</div>
                             <div class="form-group">
 							    <label class="control-label col-sm-3" for="speName">专业名称</label>
                                  <div class="col-sm-8">
-                                     <input class="form-control" id="speName" placeholder="请输入专业名称">
+{#                                     <input class="form-control" id="speName" placeholder="请输入专业名称">#}
+                                     <select class="form-control" id="speName">
+                                         {% for s in spe %}
+                                             <option value="{{ s }}">{{ s }}</option>
+                                         {% endfor %}
+                                     </select>
                                  </div>
                             </div>
                             <div class="form-group">
 							    <label class="control-label col-sm-3" for="courseName">课程名称</label>
                                  <div class="col-sm-8">
-                                     <input class="form-control" id="courseName" placeholder="请输入课程名称">
+{#                                     <input class="form-control" id="courseName" placeholder="请输入课程名称">#}
+                                     <select class="form-control" id="courseName">
+                                         {% for c in course %}
+                                             <option value="{{ c.name }}">{{ c.name }}</option>
+                                         {% endfor %}
+                                     </select>
                                  </div>
                             </div>
 		        		</form>
@@ -55,13 +70,23 @@
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="speName">专业名称</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="modSpeName" placeholder="">
+{#                                    <input class="form-control" id="modSpeName" placeholder="">#}
+                                    <select class="form-control" id="modSpeName">
+                                         {% for s in spe %}
+                                             <option value="{{ s }}">{{ s }}</option>
+                                         {% endfor %}
+                                     </select>
                                 </div>
 				  			</div>
                             <div class="form-group">
 				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="modCourseName" placeholder="">
+{#                                    <input class="form-control" id="modCourseName" placeholder="">#}
+                                    <select class="form-control" id="modCourseName">
+                                         {% for c in course %}
+                                             <option value="{{ c }}">{{ c }}</option>
+                                         {% endfor %}
+                                     </select>
                                 </div>
 				  			</div>
 		        		</form>
@@ -188,7 +213,8 @@
                     timeout: 10000,
                     success: function (result) {
                         if (result.result == "post_success") {
-                            document.getElementById(result.id).remove();
+                            {#document.getElementById(result.id).remove();#}
+                            window.location.reload();
                         } else {
                             alert('删除未成功');
                         }
@@ -196,6 +222,12 @@
                 });
             }
         })
-
+        var c = {{ jcourse | safe }}
+        $('#scId').change(function () {
+            $('#courseName').val(c[$(this).val()])
+        })
+        $('#courseName').change(function () {
+            $('#scId').val(c[$(this).val()])
+        })
     </script>
 {% endblock %}
