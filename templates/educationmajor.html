@@ -39,26 +39,26 @@
 		  	</div>
 		</div>
         <!-- modify-->
-		{% comment %}<div class="modal fade" id="modify" aria-hidden="true">
+		<div class="modal fade" id="modify" aria-hidden="true">
 		  	<div class="modal-dialog modal-sm">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">修改课程模块</h4>
+		        		<h4 class="modal-title" id="myModalLabel">修改专业</h4>
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='addform' method="post" role="form" class="form-horizontal">
                             <input id="modid" type="hidden">
 				  			<div class="form-group">
-				    			<label class="control-label col-sm-3" for="courseModule">课程模块</label>
+				    			<label class="control-label col-sm-3" for="year">年度</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="modCourseModule" placeholder="">
+                                    <input class="form-control" id="modYear" placeholder="">
                                 </div>
 				  			</div>
                             <div class="form-group">
-							    <label class="control-label col-sm-3" for="description">描述</label>
+							    <label class="control-label col-sm-3" for="majorName">专业名称</label>
                                  <div class="col-sm-8">
-                                     <input  class="form-control" id="modDescription" placeholder="请输入课程描述">
+                                     <input  class="form-control" id="modMajorName" placeholder="">
                                  </div>
                             </div>
 		        		</form>
@@ -66,7 +66,7 @@
 		      		</div>
 		    	</div>
 		  	</div>
-		</div>{% endcomment %}
+		</div>
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
                 <ul class="widget-color-list clearfix">
@@ -99,8 +99,8 @@
                         <th>专业</th>
                         <th>培养方案详细（表格）</th>
                         <th>培养方案详细（图形）</th>
-                        <th>评价</th>
                         <th>操作</th>
+                        <th style="display:none;">课程属性</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -110,11 +110,12 @@
                             <td>{{ i.majorName }}</td>
                             <td><button class="btn btn-info btn-xs formdetail">表格</button></td>
                             <td><button class="btn btn-info btn-xs graphdetail">图形</button></td>
-                            <td><button class="btn btn-info btn-xs pingjia">评价</button></td>
                             <td>
+                                <button class="btn btn-info btn-xs pingjia">评价</button>
                                 <button class="btn btn-info btn-xs xiugai">编辑</button>
                                 <button class="btn btn-info btn-xs del">删除</button>
                             </td>
+                            <td style="display:none;">{{ i.year }}</td>
                         </tr>
                     {% endfor %}
 
@@ -157,26 +158,28 @@
         $('.xiugai').on('click',function (){
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
-            var courseModule = tr.children("td").eq(1).text();
-            var description = tr.children("td").eq(2).text();
+            var year = tr.children("td").eq(5).text();
+            var majorName = tr.children("td").eq(1).text();
 
-            $('#modCourseModule').val(courseModule);
-            $('#modDescription').val(description);
+            $('#modYear').val(year);
+            $('#modMajorName').val(majorName);
             $("#modid").val(id);
             $("#modify").modal();
         });
         $('#mod').on('click',function () {
-            var courseModule = $('#modCourseModule').val();
-            var description = $('#modDescription').val();
-            if(courseModule==''){
-                $("#modCourseModule").focus();
+            var year = $('#modYear').val();
+            var majorName = $('#modMajorName').val();
+            if(year==''){
+                $("#modYear").focus();
+            }if(majorName==''){
+                $("#modMajorName").focus();
             }else{
                 var data = {};
                 data['id'] = $("#modid").val();
-                data['courseModule']=courseModule;
-                data['description']=description;
+                data['year']=year;
+                data['majorName']=majorName;
                 $.ajax({
-                    url: '/Model/courseModuleModify/',
+                    url: '/Model/educationMajorAdd/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
@@ -213,6 +216,30 @@
                 });
             }
 
+        })
+        $('.formdetail').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var year = tr.children("td").eq(5).text();
+            var majorName = tr.children("td").eq(1).text();
+                var data = {};
+                data['year']=year;
+                data['majorName']=majorName;
+
+                $.ajax({
+                    url: '/Model/educationMajor/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.href='/Model/educationCourses/?year='+year+'&majorName='+majorName;
+                        } else {
+                            alert('未成功');
+                        }
+                    }
+                })
         })
 
 

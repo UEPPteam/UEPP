@@ -63,9 +63,14 @@ urlpatterns = [
     url(r'^educationOverviewAdd/', educationOverviewAdd),
     url(r'^educationOverviewModify/', educationOverviewModify),
     url(r'^educationOverviewDelete/', educationOverviewDelete),
+    url(r'^educationOverviewPizhun/', educationOverviewPizhun),
+    url(r'^educationOverviewChexiao/', educationOverviewChexiao),
     #专业
     url(r'^educationMajor/', educationMajor),
     url(r'^educationMajorAdd/', educationMajorAdd),
     url(r'^educationMajorModify/', educationMajorModify),
     url(r'^educationMajorDelete/', educationMajorDelete),
+    #专业课程
+    url(r'^educationCourses/', educationCourses),
+    url(r'^educationCoursesDelete/', educationCoursesDelete),
 ]
