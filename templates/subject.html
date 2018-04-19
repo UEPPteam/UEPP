@@ -72,7 +72,7 @@
 		</div>
         <div class="smart-widget-inner">
             <div class="smart-widget-body">
-                <p>学科  <input> <button class="btn btn-info btn-xs">查询</button> <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加课程</button></p>
+                <p>学科  <input type="text" id="myInput1" onkeyup="myFunction1()" placeholder="搜索学科..."> <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加课程</button></p>
                 <p>经管学院学科列表</p>
                 <table class="table table-bordered" id="usertable">
                     <thead>
@@ -196,6 +196,25 @@
                 });
             }
         })
+        function myFunction1() {
+            // 声明变量
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput1");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("usertable");
+            tr = table.getElementsByTagName("tr");
 
+            // 循环表格每一行，查找匹配项
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
     </script>
 {% endblock %}

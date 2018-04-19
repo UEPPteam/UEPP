@@ -108,7 +108,7 @@
 		</div>
         <div class="smart-widget-inner">
             <div class="smart-widget-body">
-                <p>学科  <input> 课程<input><button class="btn btn-info btn-xs">查询</button> <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加</button></p>
+                <p>专业 <input type="text" id="myInput1" onkeyup="myFunction1()" placeholder="搜索专业..."> 课程<input type="text" id="myInput2" onkeyup="myFunction2()" placeholder="搜索课程..."> <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加</button></p>
                 <p>经管学院专业选修课列表</p>
                 <table class="table table-bordered" id="usertable">
                     <thead>
@@ -139,6 +139,7 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
+
         var sslist = {{ sslist | safe }}
         $('#add').on('click',function(){
             var courseName = $('#courseName').val();
@@ -275,5 +276,47 @@
                 nm.append("<option value='" + name + "'>" + name + "</option>");
             }
         })
+
+
+        function myFunction1() {
+            // 声明变量
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput1");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("usertable");
+            tr = table.getElementsByTagName("tr");
+
+            // 循环表格每一行，查找匹配项
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+        function myFunction2() {
+            // 声明变量
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput2");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("usertable");
+            tr = table.getElementsByTagName("tr");
+
+            // 循环表格每一行，查找匹配项
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[2];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
     </script>
 {% endblock %}

@@ -18,27 +18,27 @@ def base(request):
     return render(request, 'base.html')
 
 
-#课程信息
+# 课程信息
 @csrf_exempt
 def course_information(request):
     if request.method == 'GET':
-        #username = req.session['username']
-        data={}
+        # username = req.session['username']
+        data = {}
         course = Course.objects.all()
         courselist = []
         for c in course:
-            courseInfo={}
-            courseInfo['id']=c.id
-            courseInfo['courseId']= c.courseId
-            courseInfo['courseName']=c.courseName
-            courseInfo['courseAttribute']=c.courseAttribute
-            courseInfo['courseModule']=c.courseModule
-            courseInfo['courseType']=c.courseType
-            courseInfo['credit']=c.credit
-            courseInfo['creditHour']=c.creditHour
-            courseInfo['introduction']=c.introduction
-            courseInfo['pCourseId']=c.pCourseId
-            courseInfo['boundCourseId']=c.boundCourseId
+            courseInfo = {}
+            courseInfo['id'] = c.id
+            courseInfo['courseId'] = c.courseId
+            courseInfo['courseName'] = c.courseName
+            courseInfo['courseAttribute'] = c.courseAttribute
+            courseInfo['courseModule'] = c.courseModule
+            courseInfo['courseType'] = c.courseType
+            courseInfo['credit'] = c.credit
+            courseInfo['creditHour'] = c.creditHour
+            courseInfo['introduction'] = c.introduction
+            courseInfo['pCourseId'] = c.pCourseId
+            courseInfo['boundCourseId'] = c.boundCourseId
             courselist.append(courseInfo)
         data['courselist'] = courselist
         return render(request, 'course.html', data)
@@ -58,15 +58,17 @@ def courseAdd(request):
         pCourseId = request.POST.get('pCourseId')
         boundCourseId = request.POST.get('boundCourseId')
 
-        courselist = Course(courseName=courseName, courseAttribute=courseAttribute, courseModule=courseModule, courseType=courseType,
-                            credit=credit, creditHour=creditHour, introduction=introduction, pCourseId=pCourseId, boundCourseId=boundCourseId)
+        courselist = Course(courseName=courseName, courseAttribute=courseAttribute, courseModule=courseModule,
+                            courseType=courseType,
+                            credit=credit, creditHour=creditHour, introduction=introduction, pCourseId=pCourseId,
+                            boundCourseId=boundCourseId)
         courselist.save();
 
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-#课程信息-修改
+# 课程信息-修改
 @csrf_exempt
 def courseModify(request):
     if request.method == 'POST':
@@ -81,13 +83,15 @@ def courseModify(request):
         pCourseId = request.POST.get('pCourseId')
         boundCourseId = request.POST.get('boundCourseId')
         id = request.POST.get('id')
-        Course.objects.filter(id=id).update(courseName=courseName, courseAttribute=courseAttribute, courseModule=courseModule, courseType=courseType,
-                                            credit=credit,creditHour=creditHour,introduction=introduction,pCourseId=pCourseId,boundCourseId=boundCourseId)
+        Course.objects.filter(id=id).update(courseName=courseName, courseAttribute=courseAttribute,
+                                            courseModule=courseModule, courseType=courseType,
+                                            credit=credit, creditHour=creditHour, introduction=introduction,
+                                            pCourseId=pCourseId, boundCourseId=boundCourseId)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-#课程信息-删除
+# 课程信息-删除
 @csrf_exempt
 def courseDelete(req):
     if req.method == 'POST':
@@ -219,23 +223,24 @@ def spebDel(req):
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-#课程模块信息
+# 课程模块信息
 @csrf_exempt
 def courseModule(request):
     if request.method == 'GET':
-        #username = req.session['username']
-        data={}
+        # username = req.session['username']
+        data = {}
         courseModule = CourseModule.objects.all()
         courseModuleList = []
         for cm in courseModule:
-            courseModuleInfo={}
-            courseModuleInfo['id']=cm.id
-            courseModuleInfo['courseModule']= cm.courseModule
+            courseModuleInfo = {}
+            courseModuleInfo['id'] = cm.id
+            courseModuleInfo['courseModule'] = cm.courseModule
             courseModuleInfo['description'] = cm.description
 
             courseModuleList.append(courseModuleInfo)
         data['courseModuleList'] = courseModuleList
         return render(request, 'coursemodule.html', data)
+
 
 # 课程模块-新增
 @csrf_exempt
@@ -252,7 +257,7 @@ def courseModuleAdd(request):
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-#课程模块-编辑
+# 课程模块-编辑
 @csrf_exempt
 def courseModuleModify(request):
     if request.method == 'POST':
@@ -265,7 +270,7 @@ def courseModuleModify(request):
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-#课程模块-删除
+# 课程模块-删除
 @csrf_exempt
 def courseModuleDelete(request):
     if request.method == 'POST':
@@ -281,18 +286,19 @@ def courseModuleDelete(request):
 @csrf_exempt
 def courseCategory(request):
     if request.method == 'GET':
-        #username = req.session['username']
-        data={}
+        # username = req.session['username']
+        data = {}
         courseCategory = CourseCategory.objects.all()
         courseCategoryList = []
         for c in courseCategory:
-            courseInfo={}
-            courseInfo['id']=c.id
-            courseInfo['courseCategory']= c.courseCategory
-            courseInfo['description']=c.description
+            courseInfo = {}
+            courseInfo['id'] = c.id
+            courseInfo['courseCategory'] = c.courseCategory
+            courseInfo['description'] = c.description
             courseCategoryList.append(courseInfo)
         data['courseCategoryList'] = courseCategoryList
         return render(request, 'courseCategory.html', data)
+
 
 # 课程类别-增加
 @csrf_exempt
@@ -307,7 +313,8 @@ def courseCategoryAdd(request):
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
-#课程类别-编辑
+
+# 课程类别-编辑
 @csrf_exempt
 def courseCategoryModify(request):
     if request.method == 'POST':
@@ -319,7 +326,7 @@ def courseCategoryModify(request):
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-#课程类别-删除
+# 课程类别-删除
 @csrf_exempt
 def courseCategoryDelete(request):
     if request.method == 'POST':
@@ -330,27 +337,28 @@ def courseCategoryDelete(request):
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-#课程
+
+# 课程
 @csrf_exempt
 def courses(request):
     if request.method == 'GET':
-        #username = req.session['username']
-        data={}
+        # username = req.session['username']
+        data = {}
         courses = Courses.objects.all()
         coursesList = []
         for c in courses:
-            coursesInfo={}
-            coursesInfo['id']=c.id
-            coursesInfo['courseId']= c.courseId
-            coursesInfo['courseName']=c.courseName
-            coursesInfo['courseEngName']=c.courseEngName
-            coursesInfo['credit']=c.credit
-            coursesInfo['creditHour']=c.creditHour
-            coursesInfo['theoryCreditHour']=c.theoryCreditHour
-            coursesInfo['practiceCreditHour']=c.practiceCreditHour
-            coursesInfo['courseModule']=c.courseModule
-            coursesInfo['courseCategory']=c.courseCategory
-            coursesInfo['isSchoolCourse']=c.isSchoolCourse
+            coursesInfo = {}
+            coursesInfo['id'] = c.id
+            coursesInfo['courseId'] = c.courseId
+            coursesInfo['courseName'] = c.courseName
+            coursesInfo['courseEngName'] = c.courseEngName
+            coursesInfo['credit'] = c.credit
+            coursesInfo['creditHour'] = c.creditHour
+            coursesInfo['theoryCreditHour'] = c.theoryCreditHour
+            coursesInfo['practiceCreditHour'] = c.practiceCreditHour
+            coursesInfo['courseModule'] = c.courseModule
+            coursesInfo['courseCategory'] = c.courseCategory
+            coursesInfo['isSchoolCourse'] = c.isSchoolCourse
             coursesInfo['isCollegeCourse'] = c.isCollegeCourse
             coursesList.append(coursesInfo)
 
@@ -381,9 +389,12 @@ def coursesAdd(request):
         isSchoolCourse = request.POST.get('isSchoolCourse')
         isCollegeCourse = request.POST.get('isCollegeCourse')
 
-        coursesList = Courses(courseId=courseId, courseName=courseName, courseEngName=courseEngName, credit=credit, creditHour=creditHour,
-                            theoryCreditHour=theoryCreditHour, experimentCreditHour=experimentCreditHour, practiceCreditHour=practiceCreditHour, courseModule=courseModule,
-                            courseCategory=courseCategory, isSchoolCourse=isSchoolCourse, isCollegeCourse=isCollegeCourse)
+        coursesList = Courses(courseId=courseId, courseName=courseName, courseEngName=courseEngName, credit=credit,
+                              creditHour=creditHour,
+                              theoryCreditHour=theoryCreditHour, experimentCreditHour=experimentCreditHour,
+                              practiceCreditHour=practiceCreditHour, courseModule=courseModule,
+                              courseCategory=courseCategory, isSchoolCourse=isSchoolCourse,
+                              isCollegeCourse=isCollegeCourse)
         coursesList.save()
         ss = SpecializedSubject.objects.all()
         for s in ss:
@@ -396,7 +407,7 @@ def coursesAdd(request):
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-#修改
+# 修改
 @csrf_exempt
 def coursesModify(request):
     if request.method == 'POST':
@@ -405,21 +416,24 @@ def coursesModify(request):
         courseEngName = request.POST.get('courseEngName')
         credit = request.POST.get('credit')
         creditHour = request.POST.get('creditHour')
-        theoryCreditHour  = request.POST.get('theoryCreditHour')
+        theoryCreditHour = request.POST.get('theoryCreditHour')
         practiceCreditHour = request.POST.get('practiceCreditHour')
         courseModule = request.POST.get('courseModule')
         courseCategory = request.POST.get('courseCategory')
         isSchoolCourse = request.POST.get('isSchoolCourse')
         isCollegeCourse = request.POST.get('isCollegeCourse')
         id = request.POST.get('id')
-        Courses.objects.filter(id=id).update(courseId=courseId, courseName=courseName, courseEngName=courseEngName, credit=credit, creditHour=creditHour,
-                            theoryCreditHour=theoryCreditHour, practiceCreditHour=practiceCreditHour, courseModule=courseModule,
-                            courseCategory=courseCategory, isSchoolCourse=isSchoolCourse, isCollegeCourse=isCollegeCourse)
+        Courses.objects.filter(id=id).update(courseId=courseId, courseName=courseName, courseEngName=courseEngName,
+                                             credit=credit, creditHour=creditHour,
+                                             theoryCreditHour=theoryCreditHour, practiceCreditHour=practiceCreditHour,
+                                             courseModule=courseModule,
+                                             courseCategory=courseCategory, isSchoolCourse=isSchoolCourse,
+                                             isCollegeCourse=isCollegeCourse)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-#删除
+# 删除
 @csrf_exempt
 def coursesDelete(req):
     if req.method == 'POST':
@@ -448,21 +462,23 @@ def coursesDelete(req):
         # leezhen modified
         return HttpResponse(json.dumps(data), content_type='application/json')
 
+
 # 先修课
 @csrf_exempt
 def coursePrevious(request):
     if request.method == 'GET':
-        data={}
+        data = {}
         coursePrevious = CoursePrevious.objects.all()
         coursePreviousList = []
         for c in coursePrevious:
-            coursePreInfo={}
-            coursePreInfo['id']=c.id
-            coursePreInfo['courseName']= c.courseName
-            coursePreInfo['pCourseName']=c.pCourseName
+            coursePreInfo = {}
+            coursePreInfo['id'] = c.id
+            coursePreInfo['courseName'] = c.courseName
+            coursePreInfo['pCourseName'] = c.pCourseName
             coursePreviousList.append(coursePreInfo)
         data['coursePreviousList'] = coursePreviousList
         return render(request, 'courseprevious.html', data)
+
 
 # 先行课-增加
 @csrf_exempt
@@ -476,6 +492,7 @@ def coursePreviousAdd(request):
 
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
+
 
 # 先行课-编辑
 @csrf_exempt
@@ -500,17 +517,18 @@ def coursePreviousDelete(request):
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
+
 # 培养方案版本
 @csrf_exempt
 def educationOverview(request):
     if request.method == 'GET':
-        data={}
+        data = {}
         eduOverview = EducationOverview.objects.all()
         eduOverviewList = []
         for eo in eduOverview:
-            eduOverviewInfo={}
-            eduOverviewInfo['id']=eo.id
-            eduOverviewInfo['year']= eo.year
+            eduOverviewInfo = {}
+            eduOverviewInfo['id'] = eo.id
+            eduOverviewInfo['year'] = eo.year
             eduOverviewInfo['desc'] = eo.desc
             eduOverviewInfo['status'] = eo.status
 
@@ -525,7 +543,7 @@ def educationOverviewAdd(request):
         year = request.POST.get('year')
         desc = request.POST.get('desc')
         status = request.POST.get('status')
-        #if(status == "None" or status == ""):
+        # if(status == "None" or status == ""):
         #    status = "未审核"
 
         list = EducationOverview(year=year, desc=desc, status=status)
@@ -558,17 +576,18 @@ def educationOverviewDelete(request):
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
+
 # 培养方案->版本->专业
 @csrf_exempt
 def educationMajor(request):
     if request.method == 'GET':
-        data={}
+        data = {}
         eduMajor = EducationMajor.objects.all()
         eduMajorList = []
         for em in eduMajor:
-            eduMajorInfo={}
-            eduMajorInfo['id']=em.id
-            eduMajorInfo['year']= em.year
+            eduMajorInfo = {}
+            eduMajorInfo['id'] = em.id
+            eduMajorInfo['year'] = em.year
             eduMajorInfo['majorName'] = em.majorName
 
             eduMajorList.append(eduMajorInfo)
