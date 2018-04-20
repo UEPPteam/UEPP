@@ -91,3 +91,13 @@ class EducationMajor(models.Model):
     year = models.IntegerField()
     majorName = models.CharField(max_length=128)
 
+class EducationCourses(models.Model):
+    year = models.IntegerField()
+    majorName = models.CharField(max_length=128)
+    courseId = models.CharField(max_length=45)
+    courseName = models.CharField(max_length=128)
+    credit = models.FloatField(max_length=12)
+    creditHour = models.IntegerField()
+    semester = models.CharField(max_length=45)
+    courseAttribution = models.CharField(max_length=45)
+

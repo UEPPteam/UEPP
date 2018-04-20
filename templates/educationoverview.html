@@ -38,35 +38,7 @@
 		    	</div>
 		  	</div>
 		</div>
-        <!-- modify-->
-		{% comment %}<div class="modal fade" id="modify" aria-hidden="true">
-		  	<div class="modal-dialog modal-sm">
-		    	<div class="modal-content">
-		      		<div class="modal-header">
-		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">修改课程模块</h4>
-		      		</div>
-		      		<div class="modal-body">
-		        		<form  id='addform' method="post" role="form" class="form-horizontal">
-                            <input id="modid" type="hidden">
-				  			<div class="form-group">
-				    			<label class="control-label col-sm-3" for="courseModule">课程模块</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="modCourseModule" placeholder="">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-							    <label class="control-label col-sm-3" for="description">描述</label>
-                                 <div class="col-sm-8">
-                                     <input  class="form-control" id="modDescription" placeholder="请输入课程描述">
-                                 </div>
-                            </div>
-		        		</form>
-                        <a id='mod'class="btn btn-danger block m-top-md">修改</a>
-		      		</div>
-		    	</div>
-		  	</div>
-		</div>{% endcomment %}
+
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
                 <ul class="widget-color-list clearfix">
@@ -155,43 +127,7 @@
                 })
             }
         });
-        $('.xiugai').on('click',function (){
-            var tr = $(this).parents("tr");
-            var id = tr.attr("id");
-            var courseModule = tr.children("td").eq(1).text();
-            var description = tr.children("td").eq(2).text();
 
-            $('#modCourseModule').val(courseModule);
-            $('#modDescription').val(description);
-            $("#modid").val(id);
-            $("#modify").modal();
-        });
-        $('#mod').on('click',function () {
-            var courseModule = $('#modCourseModule').val();
-            var description = $('#modDescription').val();
-            if(courseModule==''){
-                $("#modCourseModule").focus();
-            }else{
-                var data = {};
-                data['id'] = $("#modid").val();
-                data['courseModule']=courseModule;
-                data['description']=description;
-                $.ajax({
-                    url: '/Model/courseModuleModify/',
-                    type: 'POST',
-                    data: data,
-                    dataType: 'json',
-                    timeout: 10000,
-                    success: function (result) {
-                        if (result == "post_success") {
-                            window.location.reload();
-                        } else {
-                            alert('修改未成功');
-                        }
-                    }
-                })
-            }
-        })
         $('.del').on('click',function () {
             var r=confirm("警告：您确定要删除此版本吗？（此操作不可恢复）");
             if (r==true) {
@@ -215,6 +151,77 @@
             }
 
         })
+        $('.detail').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var year = tr.children("td").eq(1).text();
+
+
+                var data = {};
+                data['year']=year;
+
+                $.ajax({
+                    url: '/Model/educationOverview/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.href='/Model/educationMajor/?year='+year;
+                        } else {
+                            alert('修改未成功');
+                        }
+                    }
+                })
+        })
+        $('.pizhun').on('click',function (){
+            var r=confirm("您确定要批准此大纲版本吗？");
+            if (r==true) {
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
+                var data = {}
+                data['id'] = id;
+                $.ajax({
+                    url: '/Model/educationOverviewPizhun/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result == "post_success" ) {
+                            window.location.reload();
+                        }else {
+                            alert('未成功');
+                        }
+                    }
+                })
+            }
+        })
+        $('.chexiao').on('click',function (){
+            var r=confirm("您确定要撤销此大纲版本吗？");
+            if (r==true) {
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
+                var data = {}
+                data['id'] = id;
+                $.ajax({
+                    url: '/Model/educationOverviewChexiao/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result == "post_success" ) {
+                            window.location.reload();
+                        }else {
+                            alert('未成功');
+                        }
+                    }
+                })
+            }
+        })
+
 
 
     </script>
