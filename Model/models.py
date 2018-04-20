@@ -17,9 +17,11 @@ class Course(models.Model):
 class Disciplines(models.Model):
     subjectName = models.CharField(max_length=20)
     subjectDes = models.CharField(max_length=512)
+    courseList = models.CharField(max_length=512)
 
 
 class SpecializedSubject(models.Model):
+    specId = models.CharField(max_length=20)
     spec_sub = models.CharField(max_length=20)
     subject = models.CharField(max_length=20)
     desc = models.CharField(max_length=512)
@@ -28,6 +30,7 @@ class SpecializedSubject(models.Model):
 class CoursesInDisciplines(models.Model):
     subject = models.CharField(max_length=20)
     course = models.CharField(max_length=20)
+    courseId = models.CharField(max_length=20)
 
 
 class CourseModule(models.Model):
@@ -43,15 +46,17 @@ class CourseCategory(models.Model):
 class CoreCoursesInSpecializedSubject(models.Model):
     spec_sub = models.CharField(max_length=20)
     course = models.CharField(max_length=20)
+    courseId = models.CharField(max_length=20)
 
 
 class ElectiveCoursesInSpecializedSubject(models.Model):
     spec_sub = models.CharField(max_length=20)
     course = models.CharField(max_length=20)
-
+    courseId = models.CharField(max_length=20)
 
 class ElectiveCourses(models.Model):
     course = models.CharField(max_length=20)
+    courseId = models.CharField(max_length=20)
 
 
 class Courses(models.Model):
@@ -70,7 +75,7 @@ class Courses(models.Model):
     courseAttribution = models.CharField(max_length=45)
     isSchoolCourse = models.CharField(max_length=10)
     isCollegeCourse = models.CharField(max_length=10)
-    courseType = models.CharField(max_length=20, default="F")
+    courseType = models.CharField(max_length=512, default="")
 
 
 class CoursePrevious(models.Model):

@@ -105,6 +105,7 @@
                     <thead>
                     <tr>
                         <th>序号</th>
+                        <th>课程编号</th>
                         <th>专业</th>
                         <th>课程</th>
                         <th>操作</th>
@@ -114,6 +115,7 @@
                         {% for i in list %}
                         <tr id="{{ i.id }}">
                             <td width="50" id="{{ i.id }}">{{ i.id }}</td>
+                            <td width="50" id="{{ i.courseId }}">{{ i.courseId }}</td>
                             <td width="100">{{ i.spec }}</td>
                             <td width="100">{{ i.course }}</td>
                             <td width="100">
@@ -164,9 +166,9 @@
         });
         $('.xiugai').on('click',function (){
             var tr = $(this).parents("tr");
-            var speName = tr.children("td").eq(1).text();
-            var scId = tr.children("td").eq(0).text();
-            var courseName = tr.children("td").eq(2).text();
+            var speName = tr.children("td").eq(2).text();
+            var scId = tr.children("td").eq(1).text();
+            var courseName = tr.children("td").eq(3).text();
             $('#modSpeName').val(speName);
             $('#modCourseName').val(courseName);
             $('#modid').val(scId);
@@ -216,8 +218,8 @@
             var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
-                var id = tr.children("td").eq(0).text();
-                var speName = tr.children("td").eq(1).text();
+                var id = tr.children("td").eq(1).text();
+                var speName = tr.children("td").eq(2).text();
                 console.log(id);
                 $.ajax({
                     url: '/Model/scDel',
@@ -277,7 +279,7 @@
 
             // 循环表格每一行，查找匹配项
             for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
+                td = tr[i].getElementsByTagName("td")[2];
                 if (td) {
                     if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";
@@ -297,7 +299,7 @@
 
             // 循环表格每一行，查找匹配项
             for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[2];
+                td = tr[i].getElementsByTagName("td")[3];
                 if (td) {
                     if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";

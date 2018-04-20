@@ -168,7 +168,7 @@ def spe_sub(request):
         spe_sublist = []
         for c in spe_sub:
             subInfo = {}
-            subInfo['id'] = c.id
+            subInfo['id'] = c.specId
             subInfo['spec_sub'] = c.spec_sub
             subInfo['subject'] = c.subject
             subInfo['desc'] = c.desc
@@ -192,7 +192,7 @@ def speMod(request):
         speName = request.POST.get('speName')
         print(desc)
         print(speId)
-        SpecializedSubject.objects.filter(id=speId).update(subject=subjectName, desc=desc, spec_sub=speName)
+        SpecializedSubject.objects.filter(specId=speId).update(subject=subjectName, desc=desc, spec_sub=speName)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -205,7 +205,7 @@ def speAdd(request):
         speId = request.POST.get('speId')
         speName = request.POST.get('speName')
 
-        spelist = SpecializedSubject(id=speId, subject=subjectName, desc=speDesc, spec_sub=speName)
+        spelist = SpecializedSubject(specId=speId, subject=subjectName, desc=speDesc, spec_sub=speName)
         spelist.save()
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
@@ -216,7 +216,7 @@ def speAdd(request):
 def spebDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        SpecializedSubject.objects.filter(id=id).delete()
+        SpecializedSubject.objects.filter(specId=id).delete()
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
@@ -396,13 +396,19 @@ def coursesAdd(request):
                               courseCategory=courseCategory, isSchoolCourse=isSchoolCourse,
                               isCollegeCourse=isCollegeCourse)
         coursesList.save()
+
         ss = SpecializedSubject.objects.all()
         for s in ss:
-            t = SpecializedSubject.objects.filter(id=s.id)[0]
-            ll = t.courseList.split(' ')
+            # t = SpecializedSubject.objects.filter(id=s.id)[0]
+            ll = s.courseList.split(' ')
             ll.append(courseId)
             SpecializedSubject.objects.filter(id=s.id).update(courseList=' '.join(ll))
 
+        sb = Disciplines.objects.all()
+        for ssb in sb:
+            lll = ssb.courseList.split(' ')
+            lll.append(courseId)
+            Disciplines.objects.filter(id=ssb.id).update(courseList=' '.join(lll))
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -638,28 +644,34 @@ def course_dis(request):
         data = {}
         cd = CoursesInDisciplines.objects.all()
         cdlist = []
+        i = 1
         for c in cd:
             subInfo = {}
-            subInfo['id'] = c.id
+            subInfo['id'] = i
+            subInfo['courseId'] = c.courseId
             subInfo['subject'] = c.subject
             subInfo['course'] = c.course
             cdlist.append(subInfo)
+            i = i+1
         data['list'] = cdlist
         subjects = Disciplines.objects.all()
+        slist = {}
         sublist = []
         for s in subjects:
             sublist.append(s.subjectName)
+            slist[s.subjectName] = s.courseList.split(' ')
         data['subject'] = sublist
-        t = "F"
-        courses = Courses.objects.filter(courseType=t)
-        clist = []
+        # t = "F"
+        courses = Courses.objects.all()
+        # clist = []
         cdic = {}
         for c in courses:
             # print(c)
-            clist.append({"name": c.courseName, "id": c.courseId})
+            # clist.append({"name": c.courseName, "id": c.courseId})
             cdic[c.courseName] = c.courseId
             cdic[c.courseId] = c.courseName
-        data['course'] = clist
+        # data['course'] = clist
+        data['slist'] = json.dumps(slist)
         data['jcourse'] = json.dumps(cdic)
         return render(request, 'course_dis.html', data)
 
@@ -671,20 +683,74 @@ def cdMod(request):
         subject = request.POST.get('subName')
         cdId = request.POST.get('id')
         courseName = request.POST.get('courseName')
+        orisub = request.POST.get('orisub')
         # CoursesInDisciplines.objects.filter(id=cdId).update(subject=subject, course=courseName)
-        CoursesInDisciplines.objects.filter(id=cdId).delete()
         c = Courses.objects.filter(courseName=courseName)[0]
-        cd = CoursesInDisciplines(id=c.courseId, subject=subject, course=courseName)
+        sub = Disciplines.objects.filter(subjectName=subject)[0].courseList.split(' ')
+        if c.courseId in sub:
+            sub.remove(c.courseId)
+            Disciplines.objects.filter(subjectName=subject).update(courseList=' '.join(sub))
+            ssa = SpecializedSubject.objects.filter(subject=subject)
+            for sa in ssa:
+                cl = sa.courseList.split(' ')
+                cl.remove(c.courseId)
+                SpecializedSubject.objects.filter(id=sa.id).update(courseList=' '.join(cl))
+        else:
+            result = 'false'
+            return HttpResponse(json.dumps(result), content_type='application/json')
+        sub = Disciplines.objects.all()
+        for ssub in sub:
+            cl = ssub.courseList.split(' ')
+            if c.courseId in cl:
+                cl.remove(c.courseId)
+            Disciplines.objects.filter(id=ssub.id).update(courseList=' '.join(cl))
+        CoursesInDisciplines.objects.filter(courseId=cdId).filter(subject=subject).delete()
+        #
+
+        cd = CoursesInDisciplines(courseId=c.courseId, subject=subject, course=courseName)
         cd.save()
-        Courses.objects.filter(courseId=cdId).update(courseType="F")
-        Courses.objects.filter(courseName=courseName).update(courseType="ptk")
-        ss = SpecializedSubject.objects.all()
-        for s in ss:
-            t = SpecializedSubject.objects.filter(id=s.id)[0]
-            ll = t.courseList.split(' ')
-            ll.append(cdId)
-            ll.remove(c.courseId)
-            SpecializedSubject.objects.filter(id=s.id).update(courseList=' '.join(ll))
+
+        cc = Courses.objects.filter(courseId=cdId)[0].courseType.split(' ')
+        cc.remove("ptk")
+        Courses.objects.filter(courseId=cdId).update(courseType=' '.join(cc))
+
+        # Courses.objects.filter(courseName=courseName).update(courseType="ptk")
+
+        # sub = Disciplines.objects.filter(subjectName=orisub)[0].courseList.split(' ')
+        # sub.append(cdId)
+        # Disciplines.objects.filter(subjectName=orisub).update(courseList=' '.join(sub))
+        ssa = SpecializedSubject.objects.filter(subject=orisub)
+        for sa in ssa:
+            cl = sa.courseList.split(' ')
+            cl.append(cdId)
+            SpecializedSubject.objects.filter(id=sa.id).update(courseList=' '.join(cl))
+
+        subs = Disciplines.objects.all()
+        for sub in subs:
+            cl = sub.courseList.split(' ')
+            cl.append(cdId)
+            Disciplines.objects.filter(id=sub.id).update(courseList=' '.join(cl))
+
+        for sub in subs:
+            ss = SpecializedSubject.objects.filter(subject=sub.subjectName)
+            for s in ss:
+                if cdId not in s.courseList.split(' '):
+                    cl = Disciplines.objects.filter(id=sub.id)[0].courseList.split(' ')
+                    cl.remove(cdId)
+                    Disciplines.objects.filter(id=sub.id).update(courseList=' '.join(cl))
+                    break
+
+        cc = Courses.objects.filter(courseName=courseName)[0].courseType.split(' ')
+        cc.append("ptk")
+        Courses.objects.filter(courseName=courseName).update(courseType=' '.join(cc))
+
+        # ss = SpecializedSubject.objects.all()
+        # for s in ss:
+        #     t = SpecializedSubject.objects.filter(id=s.id)[0]
+        #     ll = t.courseList.split(' ')
+        #     ll.append(cdId)
+        #     ll.remove(c.courseId)
+        #     SpecializedSubject.objects.filter(id=s.id).update(courseList=' '.join(ll))
 
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
@@ -696,12 +762,21 @@ def cdAdd(request):
         subName = request.POST.get('subName')
         cdId = request.POST.get('cdId')
         courseName = request.POST.get('courseName')
-        cdlist = CoursesInDisciplines(id=cdId, subject=subName, course=courseName)
-        Courses.objects.filter(courseId=cdId).update(courseType="ptk")
-        ss = SpecializedSubject.objects.all()
+        cdlist = CoursesInDisciplines(courseId=cdId, subject=subName, course=courseName)
+        # Courses.objects.filter(courseId=cdId).update(courseType="ptk")
+        cct = Courses.objects.filter(courseId=cdId)[0].courseType.split(' ')
+        cct.append("ptk")
+        Courses.objects.filter(courseId=cdId).update(courseType=' '.join(cct))
+        sb = Disciplines.objects.all()
+        for ssb in sb:
+            cl = ssb.courseList.split(' ')
+            if cdId in cl:
+                cl.remove(cdId)
+            Disciplines.objects.filter(id=ssb.id).update(courseList=' '.join(cl))
+        ss = SpecializedSubject.objects.filter(subject=subName)
         for s in ss:
-            t = SpecializedSubject.objects.filter(id=s.id)[0]
-            ll = t.courseList.split(' ')
+            # t = SpecializedSubject.objects.filter(id=s.id)[0]
+            ll = s.courseList.split(' ')
             ll.remove(cdId)
             SpecializedSubject.objects.filter(id=s.id).update(courseList=' '.join(ll))
         cdlist.save()
@@ -714,14 +789,38 @@ def cdAdd(request):
 def cdDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        CoursesInDisciplines.objects.filter(id=id).delete()
-        Courses.objects.filter(courseId=id).update(courseType="F")
-        ss = SpecializedSubject.objects.all()
+        sub = req.POST.get('sub')
+        CoursesInDisciplines.objects.filter(courseId=id).delete()
+        # Courses.objects.filter(courseId=id).update(courseType="F")
+        ct = Courses.objects.filter(courseId=id)[0].courseType.split(' ')
+        print(ct)
+        ct.remove("ptk")
+        Courses.objects.filter(courseId=id).update(courseType=' '.join(ct))
+
+        # sb = Disciplines.objects.filter(subjectName=sub)[0].courseList.split(' ')
+        # sb.append(id)
+        # Disciplines.objects.filter(subjectName=sub).update(courseList=' '.join(sb))
+        d = Disciplines.objects.all()
+        for di in d:
+            cl = di.courseList.split(' ')
+            cl.append(id)
+            Disciplines.objects.filter(id=di.id).update(courseList=' '.join(cl))
+
+        ss = SpecializedSubject.objects.filter(subject=sub)
         for s in ss:
-            t = SpecializedSubject.objects.filter(id=s.id)[0]
-            ll = t.courseList.split(' ')
+            # t = SpecializedSubject.objects.filter(id=s.id)[0]
+            ll = s.courseList.split(' ')
             ll.append(id)
             SpecializedSubject.objects.filter(id=s.id).update(courseList=' '.join(ll))
+
+        for di in d:
+            ss = SpecializedSubject.objects.filter(subject=di.subjectName)
+            for s in ss:
+                if id not in s.courseList.split(' '):
+                    cl = Disciplines.objects.filter(id=di.id)[0].courseList.split(' ')
+                    cl.remove(id)
+                    Disciplines.objects.filter(id=di.id).update(courseList=' '.join(cl))
+                    break
 
         data = {}
         data['result'] = 'post_success'
@@ -736,12 +835,15 @@ def spec_course(request):
         data = {}
         sc = CoreCoursesInSpecializedSubject.objects.all()
         sclist = []
+        i = 1
         for c in sc:
             subInfo = {}
-            subInfo['id'] = c.id
+            subInfo['id'] = i
+            subInfo['courseId'] = c.courseId
             subInfo['spec'] = c.spec_sub
             subInfo['course'] = c.course
             sclist.append(subInfo)
+            i = i+1
         data['list'] = sclist
         spe_subs = SpecializedSubject.objects.all()
         spelist = []
@@ -777,12 +879,24 @@ def scMod(request):
         courseName = request.POST.get('courseName')
         orispe = request.POST.get('orispe')
         # CoreCoursesInSpecializedSubject.objects.filter(id=scId).update(spec_sub=spe, course=courseName)
-        CoreCoursesInSpecializedSubject.objects.filter(id=scId).delete()
+        CoreCoursesInSpecializedSubject.objects.filter(courseId=scId).delete()
         c = Courses.objects.filter(courseName=courseName)[0]
-        sc = CoreCoursesInSpecializedSubject(id=c.courseId, spec_sub=spe, course=courseName)
+        sc = CoreCoursesInSpecializedSubject(courseId=c.courseId, spec_sub=spe, course=courseName)
         sc.save()
-        Courses.objects.filter(courseId=scId).update(courseType="F")
-        Courses.objects.filter(courseName=courseName).update(courseType="hxk")
+        # Courses.objects.filter(courseId=scId).update(courseType="F")
+        # Courses.objects.filter(courseName=courseName).update(courseType="hxk")
+        ct = Courses.objects.filter(courseId=scId)[0].courseType.split(' ')
+        ct.remove("hxk")
+        # if len(ct) == 0:
+        #     ct.append("F")
+        Courses.objects.filter(courseId=scId).update(courseType=' '.join(ct))
+        ct = Courses.objects.filter(courseName=courseName)[0].courseType.split(' ')
+        # if ct[0] == "F":
+        #     ct[0] = "hxk"
+        # else:
+        #     ct.append("hxk")
+        ct.append("hxk")
+        Courses.objects.filter(courseId=scId).update(courseType=' '.join(ct))
         # ss = SpecializedSubject.objects.filter(spec_sub=spe)[0]
         # cl = ss.courseList.split(' ')
         # cl.append(scId)
@@ -794,16 +908,61 @@ def scMod(request):
             cl.append(scId)
             cl.remove(c.courseId)
             SpecializedSubject.objects.filter(spec_sub=spe).update(courseList=' '.join(cl))
+
+            sab = SpecializedSubject.objects.filter(spec_sub=spe)[0].subject
+            subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+            if c.courseId in subcl:
+                subcl.remove(c.courseId)
+            subcl.append(scId)
+            subs = SpecializedSubject.objects.filter(subject=sab)
+            for sub in subs:
+                if scId not in sub.courseList.split(' '):
+                    subcl.remove(scId)
+                    # Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+                    break
+
+            if scId in subcl:
+                ct = Courses.objects.filter(courseId=scId)[0].courseType.split(' ')
+                if "ptk" in ct:
+                    subcl.remove(scId)
+
+            Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
         else:
             print("!e")
-            ss = SpecializedSubject.objects.filter(spec_sub=spe)[0]
+            ss = SpecializedSubject.objects.filter(spec_sub=orispe)[0]
             cl = ss.courseList.split(' ')
             cl.append(scId)
-            SpecializedSubject.objects.filter(spec_sub=spe).update(courseList=' '.join(cl))
-            ss1 = SpecializedSubject.objects.filter(spec_sub=orispe)[0]
+            SpecializedSubject.objects.filter(spec_sub=orispe).update(courseList=' '.join(cl))
+
+            sab = SpecializedSubject.objects.filter(spec_sub=orispe)[0].subject
+            subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+            subcl.append(scId)
+            subs = SpecializedSubject.objects.filter(subject=sab)
+            for sub in subs:
+                if scId not in sub.courseList.split(' '):
+                    subcl.remove(scId)
+                    # Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+                    break
+
+            if scId in subcl:
+                ct = Courses.objects.filter(courseId=scId)[0].courseType.split(' ')
+                if "ptk" in ct:
+                    subcl.remove(scId)
+
+            Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
+            ss1 = SpecializedSubject.objects.filter(spec_sub=spe)[0]
             cl1 = ss1.courseList.split(' ')
             cl1.remove(c.courseId)
-            SpecializedSubject.objects.filter(spec_sub=orispe).update(courseList=' '.join(cl1))
+            SpecializedSubject.objects.filter(spec_sub=spe).update(courseList=' '.join(cl1))
+
+            sab = SpecializedSubject.objects.filter(spec_sub=spe)[0].subject
+            subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+            if c.courseId in subcl:
+                subcl.remove(c.courseId)
+            Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -814,13 +973,28 @@ def scAdd(request):
         speName = request.POST.get('speName')
         scId = request.POST.get('scId')
         courseName = request.POST.get('courseName')
-        sclist = CoreCoursesInSpecializedSubject(id=scId, spec_sub=speName, course=courseName)
+        sclist = CoreCoursesInSpecializedSubject(courseId=scId, spec_sub=speName, course=courseName)
         sclist.save()
-        Courses.objects.filter(courseId=scId).update(courseType="hxk")
+        # Courses.objects.filter(courseId=scId).update(courseType="hxk")
+        ct = Courses.objects.filter(courseId=scId)[0].courseType.split(' ')
+        # if ct[0] == "F":
+        #     ct[0] = "hxk"
+        # else:
+        #     ct.append("hxk")
+        ct.append("hxk")
+        Courses.objects.filter(courseId=scId).update(courseType=' '.join(ct))
+        print(ct)
         ss = SpecializedSubject.objects.filter(spec_sub=speName)[0]
         cl = ss.courseList.split(' ')
         cl.remove(scId)
         SpecializedSubject.objects.filter(spec_sub=speName).update(courseList=' '.join(cl))
+
+        sab = SpecializedSubject.objects.filter(spec_sub=speName)[0].subject
+        subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+        if scId in subcl:
+            subcl.remove(scId)
+        Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -830,13 +1004,38 @@ def scAdd(request):
 def scDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        CoreCoursesInSpecializedSubject.objects.filter(id=id).delete()
-        Courses.objects.filter(courseId=id).update(courseType="F")
+        CoreCoursesInSpecializedSubject.objects.filter(courseId=id).delete()
+        # Courses.objects.filter(courseId=id).update(courseType="F")
+        ct = Courses.objects.filter(courseId=id)[0].courseType.split(' ')
+        print(ct)
+        ct.remove("hxk")
+        if len(ct) == 0:
+            ct.append("F")
+        Courses.objects.filter(courseId=id).update(courseType=' '.join(ct))
+
         spe = req.POST.get('spe')
         ss = SpecializedSubject.objects.filter(spec_sub=spe)[0]
         cl = ss.courseList.split(' ')
         cl.append(id)
         SpecializedSubject.objects.filter(spec_sub=spe).update(courseList=' '.join(cl))
+
+        sab = SpecializedSubject.objects.filter(spec_sub=spe)[0].subject
+        subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+        subcl.append(id)
+        subs = SpecializedSubject.objects.filter(subject=sab)
+        for sub in subs:
+            if id not in sub.courseList.split(' '):
+                subcl.remove(id)
+                # Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+                break
+
+        if id in subcl:
+            ct = Courses.objects.filter(courseId=id)[0].courseType.split(' ')
+            if "ptk" in ct:
+                subcl.remove(id)
+
+        Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
@@ -851,12 +1050,15 @@ def elec_course(request):
         print("saf")
         sc = ElectiveCoursesInSpecializedSubject.objects.all()
         sclist = []
+        i= 1
         for c in sc:
             subInfo = {}
-            subInfo['id'] = c.id
+            subInfo['id'] = i
+            subInfo['courseId'] = c.courseId
             subInfo['spec'] = c.spec_sub
             subInfo['course'] = c.course
             sclist.append(subInfo)
+            i = i+1
         data['list'] = sclist
         spe_subs = SpecializedSubject.objects.all()
         spelist = []
@@ -892,12 +1094,24 @@ def ecMod(request):
         courseName = request.POST.get('courseName')
         orispe = request.POST.get('orispe')
         # ElectiveCoursesInSpecializedSubject.objects.filter(id=scId).update(spec_sub=spe, course=courseName)
-        ElectiveCoursesInSpecializedSubject.objects.filter(id=scId).delete()
+        ElectiveCoursesInSpecializedSubject.objects.filter(courseId=scId).filter(spec_sub=spe).delete()
         c = Courses.objects.filter(courseName=courseName)[0]
-        ec = ElectiveCoursesInSpecializedSubject(id=c.courseId, spec_sub=spe, course=courseName)
+        ec = ElectiveCoursesInSpecializedSubject(courseId=c.courseId, spec_sub=spe, course=courseName)
         ec.save()
-        Courses.objects.filter(courseId=scId).update(courseType="F")
-        Courses.objects.filter(courseName=courseName).update(courseType="zxk")
+        # Courses.objects.filter(courseId=scId).update(courseType="F")
+        # Courses.objects.filter(courseName=courseName).update(courseType="zxk")
+        ct = Courses.objects.filter(courseId=scId)[0].courseType.split(' ')
+        ct.remove("zxk")
+        # if len(ct) == 0:
+        #     ct.append("F")
+        Courses.objects.filter(courseId=scId).update(courseType=' '.join(ct))
+        ct = Courses.objects.filter(courseName=courseName)[0].courseType.split(' ')
+        # if ct[0] == "F":
+        #     ct[0] = "zxk"
+        # else:
+        #     ct.append("zxk")
+        ct.append("zxk")
+        Courses.objects.filter(courseId=scId).update(courseType=' '.join(ct))
         # ss = SpecializedSubject.objects.filter(spec_sub=spe)[0]
         # cl = ss.courseList.split(' ')
         # cl.append(scId)
@@ -911,16 +1125,60 @@ def ecMod(request):
             print(scId)
             print(c.courseId)
             SpecializedSubject.objects.filter(spec_sub=spe).update(courseList=' '.join(cl))
+
+            sab = SpecializedSubject.objects.filter(spec_sub=spe)[0].subject
+            subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+            if c.courseId in subcl:
+                subcl.remove(c.courseId)
+            subcl.append(scId)
+            subs = SpecializedSubject.objects.filter(subject=sab)
+            for sub in subs:
+                if scId not in sub.courseList.split(' '):
+                    subcl.remove(scId)
+                    # Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+                    break
+
+            if scId in subcl:
+                ct = Courses.objects.filter(courseId=scId)[0].courseType.split(' ')
+                if "ptk" in ct:
+                    subcl.remove(scId)
+
+            Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
         else:
             print("!e")
             ss = SpecializedSubject.objects.filter(spec_sub=spe)[0]
             cl = ss.courseList.split(' ')
             cl.append(scId)
             SpecializedSubject.objects.filter(spec_sub=spe).update(courseList=' '.join(cl))
+
+            sab = SpecializedSubject.objects.filter(spec_sub=orispe)[0].subject
+            subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+            subcl.append(scId)
+            subs = SpecializedSubject.objects.filter(subject=sab)
+            for sub in subs:
+                if scId not in sub.courseList.split(' '):
+                    subcl.remove(scId)
+                    # Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+                    break
+
+            if scId in subcl:
+                ct = Courses.objects.filter(courseId=scId)[0].courseType.split(' ')
+                if "ptk" in ct:
+                    subcl.remove(scId)
+
+            Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
             ss1 = SpecializedSubject.objects.filter(spec_sub=orispe)[0]
             cl1 = ss1.courseList.split(' ')
             cl1.remove(c.courseId)
             SpecializedSubject.objects.filter(spec_sub=orispe).update(courseList=' '.join(cl1))
+
+            sab = SpecializedSubject.objects.filter(spec_sub=spe)[0].subject
+            subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+            if c.courseId in subcl:
+                subcl.remove(c.courseId)
+            Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -932,13 +1190,27 @@ def ecAdd(request):
         scId = request.POST.get('cdId')
         courseName = request.POST.get('courseName')
 
-        sclist = ElectiveCoursesInSpecializedSubject(id=scId, spec_sub=speName, course=courseName)
+        sclist = ElectiveCoursesInSpecializedSubject(courseId=scId, spec_sub=speName, course=courseName)
         sclist.save()
-        Courses.objects.filter(courseId=scId).update(courseType="zxk")
+        # Courses.objects.filter(courseId=scId).update(courseType="zxk")
+        ct = Courses.objects.filter(courseId=scId)[0].courseType.split(' ')
+        # if ct[0] == "F":
+        #     ct[0] = "zxk"
+        # else:
+        #     ct.append("zxk")
+        ct.append("zxk")
+        Courses.objects.filter(courseId=scId).update(courseType=' '.join(ct))
         ss = SpecializedSubject.objects.filter(spec_sub=speName)[0]
         cl = ss.courseList.split(' ')
         cl.remove(scId)
         SpecializedSubject.objects.filter(spec_sub=speName).update(courseList=' '.join(cl))
+
+        sab = SpecializedSubject.objects.filter(spec_sub=speName)[0].subject
+        subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+        if scId in subcl:
+            subcl.remove(scId)
+        Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -948,13 +1220,37 @@ def ecAdd(request):
 def ecDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        ElectiveCoursesInSpecializedSubject.objects.filter(id=id).delete()
-        Courses.objects.filter(courseId=id).update(courseType="F")
         spe = req.POST.get('spe')
+        ElectiveCoursesInSpecializedSubject.objects.filter(courseId=id).filter(spec_sub=spe).delete()
+        # Courses.objects.filter(courseId=id).update(courseType="F")
+        ct = Courses.objects.filter(courseId=id)[0].courseType.split(' ')
+        ct.remove("hxk")
+        if len(ct) == 0:
+            ct.append("F")
+        Courses.objects.filter(courseId=id).update(courseType=' '.join(ct))
+
         ss = SpecializedSubject.objects.filter(spec_sub=spe)[0]
         cl = ss.courseList.split(' ')
         cl.append(id)
         SpecializedSubject.objects.filter(spec_sub=spe).update(courseList=' '.join(cl))
+
+        sab = SpecializedSubject.objects.filter(spec_sub=spe)[0].subject
+        subcl = Disciplines.objects.filter(subjectName=sab)[0].courseList.split(' ')
+        subcl.append(id)
+        subs = SpecializedSubject.objects.filter(subject=sab)
+        for sub in subs:
+            if id not in sub.courseList.split(' '):
+                subcl.remove(id)
+                # Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+                break
+
+        if id in subcl:
+            ct = Courses.objects.filter(courseId=id)[0].courseType.split(' ')
+            if "ptk" in ct:
+                subcl.remove(id)
+
+        Disciplines.objects.filter(subjectName=sab).update(courseList=' '.join(subcl))
+
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
@@ -969,15 +1265,17 @@ def e_course(request):
         print("saf")
         sc = ElectiveCourses.objects.all()
         sclist = []
+        i = 1
         for c in sc:
             subInfo = {}
-            subInfo['id'] = c.id
+            subInfo['id'] = i
+            subInfo['courseId'] = c.courseId
             subInfo['course'] = c.course
             sclist.append(subInfo)
         data['list'] = sclist
 
-        t = "F"
-        courses = Courses.objects.filter(courseType=t)
+        # t = "F"
+        courses = Courses.objects.filter(courseType="")
         clist = []
         cdic = {}
         for c in courses:
@@ -996,7 +1294,7 @@ def eecMod(request):
     if request.method == 'POST':
         scId = request.POST.get('id')
         courseName = request.POST.get('courseName')
-        ElectiveCourses.objects.filter(id=scId).delete()
+        ElectiveCourses.objects.filter(courseId=scId).delete()
         c = Courses.objects.filter(courseName=courseName)[0]
         ec = ElectiveCourses(id=c.courseId, course=c.courseName)
         ec.save()
@@ -1012,7 +1310,7 @@ def eecAdd(request):
         scId = request.POST.get('cdId')
         courseName = request.POST.get('courseName')
 
-        sclist = ElectiveCourses(id=scId, course=courseName)
+        sclist = ElectiveCourses(courseId=scId, course=courseName)
         sclist.save()
         Courses.objects.filter(courseId=scId).update(courseType="rxk")
         result = 'post_success'
@@ -1024,7 +1322,7 @@ def eecAdd(request):
 def eecDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        ElectiveCourses.objects.filter(id=id).delete()
+        ElectiveCourses.objects.filter(courseId=id).delete()
         Courses.objects.filter(courseId=id).update(courseType="F")
         data = {}
         data['result'] = 'post_success'
