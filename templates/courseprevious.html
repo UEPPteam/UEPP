@@ -23,14 +23,19 @@
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="courseName" placeholder="请输入课程模块">
+                                    <input class="form-control" id="courseName" placeholder="请输入课程名称" value="{{ courseName }}">
                                 </div>
 				  			</div>
                             <div class="form-group">
-							    <label class="control-label col-sm-3" for="pCourseName">先修课名称</label>
-                                 <div class="col-sm-8">
-                                     <input class="form-control" id="pCourseName" placeholder="请输入先修课名称">
-                                 </div>
+                                <label class="col-sm-3 control-label">先修课名称</label>
+                                <input type="hidden"  name = "pCourseName" for="pCourseName">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="pCourseName">
+                                         {% for i in courseList %}
+                                             <option value="{{ i.courseName }}">{{ i.courseName }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
                             </div>
 		        		</form>
                         <a id='add'class="btn btn-danger block m-top-md">添加</a>
@@ -104,7 +109,7 @@
                     <tbody>
                     {% for i in coursePreviousList %}
                         <tr id="{{ i.id }}">
-                            <td>{{ i.id }}</td>
+                            <td>{{ i.count }}</td>
                             <td>{{ i.courseName }}</td>
                             <td>{{ i.pCourseName }}</td>
                             <td>

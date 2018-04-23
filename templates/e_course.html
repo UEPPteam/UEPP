@@ -84,7 +84,15 @@
 		</div>
         <div class="smart-widget-inner">
             <div class="smart-widget-body">
-                <p>课程<input type="text" id="myInput1" onkeyup="myFunction1()" placeholder="搜索课程..."> <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加</button></p>
+                <table style="border: 0px solid transparent !important;" aligh="center">
+                    <td width="60"><h5>课程</h5></td>
+                    <td width="300"><input type="text" class="form-control" id="myInput1"  onkeyup="myFunction1()" placeholder="搜索课程..." style="width:300px">{% comment %}<span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Go!</button>
+                    </span>{% endcomment %}</td>
+                    <td width="200"></td>
+                    <td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:5px">添加</button></td>
+                </table>
+            <br/>
                 <p>经管学院任意选修课列表</p>
                 <table class="table table-bordered" id="usertable">
                     <thead>
