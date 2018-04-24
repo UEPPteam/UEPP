@@ -23,56 +23,64 @@
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="year">年度</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="year" placeholder="" readonly>
+                                    <input class="form-control" id="year" value="{{ year }}" readonly>
                                 </div>
 				  			</div>
                             <div class="form-group">
 				    			<label class="control-label col-sm-3" for="majorName">专业</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="majorName" placeholder="" readonly>
+                                    <input class="form-control" id="majorName" value="{{ majorName }}" readonly>
                                 </div>
 				  			</div>
                             <div class="form-group">
-				    			<label class="control-label col-sm-3" for="courseId">课程编码</label>
+                                <label class="col-sm-3 control-label">课程模块</label>
+                                <input type="hidden"  name = "courseModule" for="courseModule">
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="courseId" placeholder="">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="courseName" placeholder="">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-				    			<label class="control-label col-sm-3" for="credit">学分</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="deCredit" placeholder="">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-				    			<label class="control-label col-sm-3" for="creditHour">学时</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="creditHour" placeholder="">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-				    			<label class="control-label col-sm-3" for="semester">学期</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="semester" placeholder="">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">课程性质</label>
-                                <input type="hidden"  name = "courseAttribution" id="courseAttribution">
-                                <div class="col-sm-8">
-                                    <select id="courseAttribution_" class="form-control">
-                                        <option value="null"></option>
-                                        <option value="bixiu">必修课</option>
-                                        <option value="xuanxiu">选修课</option>
+                                    <select class="form-control" id="courseModule" onchange="fn1()">
+                                         {% for i in courseModuleList %}
+                                             <option value="{{ i.courseModule }}">{{ i.courseModule }}</option>
+                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">课程类别</label>
+                                <input type="hidden"  name = "courseCategory" for="courseCategory">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="courseCategory" onchange="fn1()">
+                                         {% for i in courseCategoryList %}
+                                             <option value="{{ i.courseCategory }}">{{ i.courseCategory }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
+                                <input type="hidden"  name = "courseCategory" for="courseName">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="courseName" onchange="fn2()">
+                                         {% for i in courseList %}
+                                             <option value="{{ i.courseName }}">{{ i.courseName }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="col-sm-3 control-label">学期</label>
+                                <input type="hidden"  name = "semester" for="semester">
+                                <div class="col-sm-8">
+                                    <select id="semester" class="form-control">
+                                        <option value="一">一</option>
+                                        <option value="二">二</option>
+                                        <option value="三">三</option>
+                                        <option value="四">四</option>
+                                        <option value="五">五</option>
+                                        <option value="六">六</option>
+                                        <option value="七">七</option>
+                                        <option value="八">八</option>
+                                    </select>
+                                </div>
+				  			</div>
 		        		</form>
                         <a id='add'class="btn btn-danger block m-top-md">添加</a>
 		      		</div>
@@ -236,73 +244,25 @@
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
 
-        $('#courseModule_').change(function(){
-            var key = this.value;
-            $('#courseModule').val(key);
-        })
-        $('#courseCategory_').change(function(){
-            var key = this.value;
-            $('#courseCategory').val(key);
-        })
-        $('#courseAttribution_').change(function(){
-            var key = this.value;
-            $('#courseAttribution').val(key);
-        })
-        $('#isSchoolCourse_').change(function(){
-            var key = this.value;
-            $('#isSchoolCourse').val(key);
-        })
-        $('#isCollegeCourse_').change(function(){
-            var key = this.value;
-            $('#isCollegeCourse').val(key);
-        })
-
         $('#add').on('click',function(){
-            var courseId = $('#courseId').val();
+            var year = $('#year').val();
+            var majorName = $('#majorName').val();
             var courseName = $('#courseName').val();
-            var courseEngName = $('#courseEngName').val();
-            var credit = $('#credit').val();
-            var creditHour = $('#creditHour').val();
-            var theoryCreditHour = $('#theoryCreditHour').val();
-            var experimentCreditHour = $('#experimentCreditHour').val();
-            var practiceCreditHour = $('#practiceCreditHour').val();
-            var courseModule = $('#courseModule').val();
-            var courseCategory = $('#courseCategory').val();
-            var courseAttribution = $('#courseAttribution').val();
-            var isSchoolCourse = $('#isSchoolCourse').val();
-            var isCollegeCourse = $('#isCollegeCourse').val();
+            var semester = $('#semester').val();
 
-            if(courseId==''){
-                $("#courseModule").focus();
-            }else if(courseName==''){
+            if(courseName==''){
                 $("#courseName").focus();
-            }else if(credit==''){
-                $("#credit").focus();
-            }else if(creditHour==''){
-                $("#creditHour").focus();
-            }else if(theoryCreditHour==''){
-                $("#theoryCreditHour").focus();
-            }else if(experimentCreditHour==''){
-                $("#experimentCreditHour").focus();
-            }else if(practiceCreditHour==''){
-                $("#practiceCreditHour").focus();
-            }else{
+            }else if(semester==''){
+                $("#semester").focus();
+            }{
                 var data = {}
-                data['courseId']=courseId;
+                data['year']=year;
+                data['majorName']=majorName;
                 data['courseName']=courseName;
-                data['courseEngName']=courseEngName;
-                data['credit']=credit;
-                data['creditHour']=creditHour;
-                data['theoryCreditHour']=theoryCreditHour;
-                data['experimentCreditHour']=experimentCreditHour;
-                data['practiceCreditHour']=practiceCreditHour;
-                data['courseModule']=courseModule;
-                data['courseCategory']=courseCategory;
-                data['courseAttribution']=courseAttribution;
-                data['isSchoolCourse']=isSchoolCourse;
-                data['isCollegeCourse']=isCollegeCourse;
+                data['semester']=semester;
+
                 $.ajax({
-                    url: '/Model/coursesAdd/',
+                    url: '/Model/educationCoursesAdd/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
@@ -311,7 +271,7 @@
                         if ( result == "post_success" ) {
                             window.location.reload();
                         }else {
-                            alert('未成功');
+                            alert(result);
                         }
                     }
                 })
@@ -515,6 +475,38 @@
                     }
                 }
             }
+        }
+
+        var list = {{ list | safe }}
+        function fn1() {
+            var courseModule = $('#courseModule').val();
+            var courseCategory = $('#courseCategory').val();
+            var courseName = document.getElementById("courseName");
+            var str = "";
+            for(var i=0;i<list.length;i++){
+                if(courseModule==list[i].courseModule && courseCategory==list[i].courseCategory){
+                    var name = list[i].courseName;
+                    str += "<option value='" + name + "'>" + name + "</option>";
+                }
+            }
+            courseName.innerHTML = str;
+        }
+        function fn2() {
+            var courseName = $('#courseName').val();
+            var courseModule = document.getElementById("courseModule");
+            var courseCategory = document.getElementById("courseCategory");
+            var moduleStr = "";
+            var categoryStr = "";
+            for(var i=0;i<list.length;i++){
+                if(courseName==list[i].courseName){
+                    var module = list[i].courseModule;
+                    moduleStr += "<option value='" + module + "'>" + module + "</option>";
+                    var category = list[i].courseCategory;
+                    categoryStr += "<option value='" + category + "'>" + category + "</option>";
+                }
+            }
+            courseModule.innerHTML = moduleStr;
+            courseCategory.innerHTML = categoryStr;
         }
 
 

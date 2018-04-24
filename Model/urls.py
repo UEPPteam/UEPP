@@ -71,4 +71,5 @@ urlpatterns = [
     #专业课程
     url(r'^educationCourses/', educationCourses),
     url(r'^educationCoursesDelete/', educationCoursesDelete),
+    url(r'^educationCoursesAdd/', educationCoursesAdd),
 ]
