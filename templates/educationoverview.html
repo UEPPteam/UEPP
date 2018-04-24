@@ -57,11 +57,11 @@
             <div class="smart-widget-body">
                 <table style="border: 0px solid transparent !important;" aligh="center">
                     <td width="60"><h5>年度</h5></td>
-                    <td width="300"><input type="text" class="form-control">{% comment %}<span class="input-group-btn">
+                    <td width="300"><input type="text" class="form-control" id="myInput1"  onkeyup="myFunction1()" placeholder="搜索年度..." style="width:300px">{% comment %}<span class="input-group-btn">
                         <button class="btn btn-default" type="button">Go!</button>
                     </span>{% endcomment %}</td>
-                    <td width="200"><button class="btn btn-info btn-xs" style="padding:3px">查询</button></td>
-                    <td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">新建培养方案版本</button></td>
+                    <td width="200"></td>
+                    <td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:5px">新建培养方案版本</button></td>
                 </table>
             <br/>
                 <table class="table table-bordered" id="usertable">
@@ -221,6 +221,26 @@
                 })
             }
         })
+        function myFunction1() {
+            // 声明变量
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput1");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("usertable");
+            tr = table.getElementsByTagName("tr");
+
+            // 循环表格每一行，查找匹配项
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
 
 
 

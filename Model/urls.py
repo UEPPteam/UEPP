@@ -24,8 +24,6 @@ urlpatterns = [
     url(r'^courseModuleModify/', courseModuleModify),
     url(r'^courseModuleDelete/', courseModuleDelete),
     #课程种类
-    url(r'^courseCategory', courseCategory),
-    url(r'^courseCategoryAdd', courseCategoryAdd),
     url(r'^course_dis', course_dis),
     url(r'^cdAdd', cdAdd),
     url(r'^cdMod', cdMod),
@@ -73,4 +71,5 @@ urlpatterns = [
     #专业课程
     url(r'^educationCourses/', educationCourses),
     url(r'^educationCoursesDelete/', educationCoursesDelete),
+    url(r'^educationCoursesAdd/', educationCoursesAdd),
 ]
