@@ -111,12 +111,16 @@ def subject(request):
         data = {}
         subject = Disciplines.objects.all()
         subjectlist = []
+        i = 1
         for c in subject:
             subInfo = {}
+            subInfo['count'] = i
             subInfo['id'] = c.id
+            subInfo['subid'] = c.subjectId
             subInfo['name'] = c.subjectName
             subInfo['desc'] = c.subjectDes
             subjectlist.append(subInfo)
+            i = i + 1
         data['list'] = subjectlist
         return render(request, 'subject.html', data)
 
@@ -129,7 +133,7 @@ def subMod(request):
         subjectName = request.POST.get('subjectName')
         subjectDesc = request.POST.get('subjectDesc')
         subid = request.POST.get('id')
-        Disciplines.objects.filter(id=subid).update(subjectName=subjectName, subjectDes=subjectDesc)
+        Disciplines.objects.filter(subjectId=subid).update(subjectName=subjectName, subjectDes=subjectDesc)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -141,7 +145,7 @@ def subAdd(request):
         subjectDesc = request.POST.get('subjectDesc')
         subjectId = request.POST.get('subjectId')
 
-        courselist = Disciplines(id=subjectId, subjectName=subjectName, subjectDes=subjectDesc)
+        courselist = Disciplines(subjectId=subjectId, subjectName=subjectName, subjectDes=subjectDesc)
         courselist.save()
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')

@@ -84,6 +84,7 @@
                     <thead>
                     <tr>
                         <th>序号</th>
+                        <th>学科编号</th>
                         <th>学科</th>
                         <th>描述</th>
                         <th>操作</th>
@@ -92,7 +93,8 @@
                     <tbody>
                         {% for i in list %}
                         <tr id="{{ i.id }}">
-                            <td width="50" id="{{ i.id }}">{{ i.id }}</td>
+                            <td width="50" id="{{ i.count }}">{{ i.count }}</td>
+                            <td width="100" id="{{ i.subid }}">{{ i.subid }}</td>
                             <td width="200">{{ i.name }}</td>
                             <td width="500">{{ i.desc }}</td>
                             <td width="100">
@@ -212,7 +214,7 @@
 
             // 循环表格每一行，查找匹配项
             for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
+                td = tr[i].getElementsByTagName("td")[2];
                 if (td) {
                     if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";

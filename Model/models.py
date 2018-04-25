@@ -15,6 +15,7 @@ class Course(models.Model):
 
 
 class Disciplines(models.Model):
+    subjectId = models.CharField(max_length=20)
     subjectName = models.CharField(max_length=20)
     subjectDes = models.CharField(max_length=512)
     courseList = models.CharField(max_length=512)
