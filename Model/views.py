@@ -1506,6 +1506,12 @@ def coursesAdd(request):
             ll.append(courseId)
             SpecializedSubject.objects.filter(id=s.id).update(courseList=' '.join(ll))
 
+        sb = Disciplines.objects.all()
+        for ssb in sb:
+            lll = ssb.courseList.split(' ')
+            lll.append(courseId)
+            Disciplines.objects.filter(id=ssb.id).update(courseList=' '.join(lll))
+            
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
