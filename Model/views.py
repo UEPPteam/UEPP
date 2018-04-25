@@ -484,9 +484,19 @@ def coursesDelete(req):
                 flag = 0
                 break
             SpecializedSubject.objects.filter(id=s.id).update(courseList=' '.join(ll))
+        d = Disciplines.objects.all()
+        f = 1
+        for i in d:
+            ll = i.courseList.strip().split(' ')
+            if iid in ll:
+                ll.remove(iid)
+            else:
+                f = 0
+                break
+            Disciplines.objects.filter(id=i.id).update(courseList=' '.join(ll))
         # leezhen add
         data = {}
-        if flag == 1:
+        if flag == 1 and f == 1:
             Courses.objects.filter(id=id).delete()
             data['result'] = 'post_success'
             data['id'] = id
@@ -893,7 +903,7 @@ def cdDel(req):
             ll = s.courseList.strip().split(' ')
             ll.append(id)
             SpecializedSubject.objects.filter(id=s.id).update(courseList=' '.join(ll))
-
+        d = Disciplines.objects.all()
         for di in d:
             ss = SpecializedSubject.objects.filter(subject=di.subjectName)
             for s in ss:
