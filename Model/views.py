@@ -1324,7 +1324,7 @@ def ecDel(req):
         ElectiveCoursesInSpecializedSubject.objects.filter(courseId=id).filter(spec_sub=spe).delete()
         # Courses.objects.filter(courseId=id).update(courseType="F")
         ct = Courses.objects.filter(courseId=id)[0].courseType.split(' ')
-        ct.remove("hxk")
+        ct.remove("zxk")
         if len(ct) == 0:
             ct.append("F")
         Courses.objects.filter(courseId=id).update(courseType=' '.join(ct))
