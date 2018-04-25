@@ -132,8 +132,9 @@ def subMod(request):
         print("adfa")
         subjectName = request.POST.get('subjectName')
         subjectDesc = request.POST.get('subjectDesc')
-        subid = request.POST.get('id')
-        Disciplines.objects.filter(subjectId=subid).update(subjectName=subjectName, subjectDes=subjectDesc)
+        subjectId = request.POST.get('subId')
+        id = request.POST.get('id')
+        Disciplines.objects.filter(id=id).update(subjectId=subjectId, subjectName=subjectName, subjectDes=subjectDesc)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -170,13 +171,17 @@ def spe_sub(request):
         data = {}
         spe_sub = SpecializedSubject.objects.all()
         spe_sublist = []
+        i = 1
         for c in spe_sub:
             subInfo = {}
-            subInfo['id'] = c.specId
+            subInfo['count'] = i
+            subInfo['id'] = c.id
+            subInfo['speid'] = c.specId
             subInfo['spec_sub'] = c.spec_sub
             subInfo['subject'] = c.subject
             subInfo['desc'] = c.desc
             spe_sublist.append(subInfo)
+            i = i + 1
         data['list'] = spe_sublist
         subjects = Disciplines.objects.all()
         sublist = []
@@ -192,11 +197,11 @@ def speMod(request):
     if request.method == 'POST':
         subjectName = request.POST.get('subjectName')
         desc = request.POST.get('desc')
-        speId = request.POST.get('id')
+        id = request.POST.get('id')
+        speid = request.POST.get('speid')
         speName = request.POST.get('speName')
-        print(desc)
-        print(speId)
-        SpecializedSubject.objects.filter(specId=speId).update(subject=subjectName, desc=desc, spec_sub=speName)
+        print(speName)
+        SpecializedSubject.objects.filter(id=id).update(specId=speid, subject=subjectName, desc=desc, spec_sub=speName)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -220,7 +225,7 @@ def speAdd(request):
 def spebDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        SpecializedSubject.objects.filter(specId=id).delete()
+        SpecializedSubject.objects.filter(id=id).delete()
         data = {}
         data['result'] = 'post_success'
         data['id'] = id

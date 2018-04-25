@@ -63,6 +63,12 @@
 		      		<div class="modal-body">
 		        		<form  id='addform' method="post" role="form" class="form-horizontal">
                             <input id="modid" type="hidden">
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="speid">专业编号</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modSpeId" placeholder="">
+                                </div>
+				  			</div>
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="speName">专业名称</label>
                                 <div class="col-sm-8">
@@ -87,7 +93,7 @@
                                  </div>
                             </div>
 		        		</form>
-                        <a id='modCourseModule' class="btn btn-danger block m-top-md">修改</a>
+                        <a id='modSpe' class="btn btn-danger block m-top-md">修改</a>
 		      		</div>
 		    	</div>
 		  	</div>
@@ -105,6 +111,7 @@
                 <table class="table table-bordered" id="usertable">
                     <thead>
                     <tr>
+                        <th>序号</th>
                         <th>专业编号</th>
                         <th>专业</th>
                         <th>学科</th>
@@ -115,7 +122,8 @@
                     <tbody>
                         {% for i in list %}
                         <tr id="{{ i.id }}">
-                            <td width="50" id="{{ i.id }}">{{ i.id }}</td>
+                            <td width="50" id="{{ i.count }}">{{ i.count }}</td>
+                            <td width="50" id="{{ i.speid }}">{{ i.id }}</td>
                             <td width="100">{{ i.spec_sub }}</td>
                             <td width="100">{{ i.subject }}</td>
                             <td width="500">{{ i.desc }}</td>
@@ -170,13 +178,15 @@
         });
         $('.xiugai').on('click',function (){
             var tr = $(this).parents("tr");
-            var subjectName = tr.children("td").eq(2).text();
-            var desc = tr.children("td").eq(3).text();
-            var speId = tr.children("td").eq(0).text();
-            var speName = tr.children("td").eq(1).text();
+            var subjectName = tr.children("td").eq(3).text();
+            var desc = tr.children("td").eq(4).text();
+            var speId = tr.children("td").eq(1).text();
+            var speName = tr.children("td").eq(2).text();
+            var id=tr.attr("id");
+            $('#modid').val(id);
             $('#modSubjectName').val(subjectName);
             $('#modSpeDesc').val(desc);
-            $('#modid').val(speId);
+            $('#modSpeId').val(speId);
             $('#modSpeName').val(speName);
             $("#modify").modal();
         });
@@ -184,7 +194,9 @@
             var subjectName = $('#modSubjectName').val();
             var desc = $('#modSpeDesc').val();
             var speName = $('#modSpeName').val();
+            var speId = $('#modSpeId').val();
             var id = $('#modid').val();
+            console.log(id);
             if(subjectName==''){
                 $("#modSubjectName").focus();
             }else if(desc==''){
@@ -197,6 +209,7 @@
                 data['desc']= desc;
                 data['speName'] = speName;
                 data['id'] = id;
+                data['speid'] = speId;
                 console.log(data);
                 $.ajax({
                     url: '/Model/speMod',
