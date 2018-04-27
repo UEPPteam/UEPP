@@ -123,7 +123,7 @@
                         {% for i in list %}
                         <tr id="{{ i.id }}">
                             <td width="50" id="{{ i.count }}">{{ i.count }}</td>
-                            <td width="50" id="{{ i.speid }}">{{ i.id }}</td>
+                            <td width="100" id="{{ i.speid }}">{{ i.speid }}</td>
                             <td width="100">{{ i.spec_sub }}</td>
                             <td width="100">{{ i.subject }}</td>
                             <td width="500">{{ i.desc }}</td>
@@ -259,7 +259,7 @@
 
             // 循环表格每一行，查找匹配项
             for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
+                td = tr[i].getElementsByTagName("td")[2];
                 if (td) {
                     if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";

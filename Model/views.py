@@ -145,8 +145,12 @@ def subAdd(request):
         subjectName = request.POST.get('subjectName')
         subjectDesc = request.POST.get('subjectDesc')
         subjectId = request.POST.get('subjectId')
-
-        courselist = Disciplines(subjectId=subjectId, subjectName=subjectName, subjectDes=subjectDesc)
+        cl = []
+        courses = Courses.objects.all()
+        for c in courses:
+            cl.append(c.courseId)
+        courselist = Disciplines(subjectId=subjectId, subjectName=subjectName,
+                                 subjectDes=subjectDesc, courseList=' '.join(cl))
         courselist.save()
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
@@ -157,8 +161,13 @@ def subAdd(request):
 def subDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        Disciplines.objects.filter(id=id).delete()
         data = {}
+        d = Disciplines.objects.filter(id=id)[0].courseList.strip().split(' ')
+        courses = Courses.objects.all()
+        if len(d) != len(courses):
+            data['result'] = 'false'
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        Disciplines.objects.filter(id=id).delete()
         data['result'] = 'post_success'
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
@@ -214,8 +223,16 @@ def speAdd(request):
         speId = request.POST.get('speId')
         speName = request.POST.get('speName')
 
-        spelist = SpecializedSubject(specId=speId, subject=subjectName, desc=speDesc, spec_sub=speName)
+        cl = []
+        # courses = Courses.objects.all()
+        d = Disciplines.objects.filter(subjectName=subjectName)[0].courseList.strip().split(' ')
+        for c in d:
+            cl.append(c)
+
+        spelist = SpecializedSubject(specId=speId, subject=subjectName, desc=speDesc,
+                                     spec_sub=speName, courseList=' '.join(cl))
         spelist.save()
+
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -225,9 +242,18 @@ def speAdd(request):
 def spebDel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        SpecializedSubject.objects.filter(id=id).delete()
+        spe = SpecializedSubject.objects.filter(id=id)[0].spec_sub
+        cs = CoreCoursesInSpecializedSubject.objects.filter(spec_sub=spe)
         data = {}
         data['result'] = 'post_success'
+        if len(cs) > 0:
+            data['result'] = 'false'
+        es = ElectiveCoursesInSpecializedSubject.objects.filter(spec_sub=spe)
+        if len(es) > 0:
+            data['result'] = 'false'
+        if data['result'] == 'false':
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        SpecializedSubject.objects.filter(id=id).delete()
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
