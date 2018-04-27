@@ -99,6 +99,7 @@
                         <button class="btn btn-default" type="button">Go!</button>
                     </span>{% endcomment %}</td>
                     <td width="200"></td>
+                    <td width="200"><button id="importMajors" class="btn btn-info btn-sm" style="padding:5px">一键导入所有专业</button></td>
                     <td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:5px">新增方案专业</button></td>
                 </table>
             <br/>
@@ -271,6 +272,25 @@
                 }
             }
         }
+        $('#importMajors').on('click',function(){
+                var data = {};
+                data['year']={{ year }};
+            $.ajax({
+                    url: '/Model/educationMajorImportMajors/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.reload();
+                            alert("已成功导入");
+                        } else {
+                            alert('导入未成功');
+                        }
+                    }
+                });
+        })
 
 
     </script>

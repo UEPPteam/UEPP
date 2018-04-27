@@ -1,0 +1,535 @@
+{% extends 'base.html' %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+           教学大纲管理 > 教学计划 > 专业 > 课程调整（表格）
+            <span class="smart-widget-option">
+                <a href="#" class="widget-collapse-option" data-toggle="collapse">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+            </span>
+        </div>
+        <!-- add-->
+
+		<div class="modal fade" id="formInModal" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">添加课程</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="year">年度</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="year" value="{{ year }}" readonly>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="majorName">专业</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="majorName" value="{{ majorName }}" readonly>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">课程模块</label>
+                                <input type="hidden"  name = "courseModule" for="courseModule">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="courseModule" onchange="fn1()">
+                                         {% for i in courseModuleList %}
+                                             <option value="{{ i.courseModule }}">{{ i.courseModule }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">课程类别</label>
+                                <input type="hidden"  name = "courseCategory" for="courseCategory">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="courseCategory" onchange="fn1()">
+                                         {% for i in courseCategoryList %}
+                                             <option value="{{ i.courseCategory }}">{{ i.courseCategory }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
+                                <input type="hidden"  name = "courseCategory" for="courseName">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="courseName" onchange="fn2()">
+                                         {% for i in courseList %}
+                                             <option value="{{ i.courseName }}">{{ i.courseName }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="col-sm-3 control-label">学期</label>
+                                <input type="hidden"  name = "semester" for="semester">
+                                <div class="col-sm-8">
+                                    <select id="semester" class="form-control">
+                                        <option value="一">一</option>
+                                        <option value="二">二</option>
+                                        <option value="三">三</option>
+                                        <option value="四">四</option>
+                                        <option value="五">五</option>
+                                        <option value="六">六</option>
+                                        <option value="七">七</option>
+                                        <option value="八">八</option>
+                                    </select>
+                                </div>
+				  			</div>
+		        		</form>
+                        <a id='add'class="btn btn-danger block m-top-md">添加</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- modify-->
+		<div class="modal fade" id="modify" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">修改课程状态</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='addform' method="post" role="form" class="form-horizontal">
+                            <input id="modid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modCourseName" value="" placeholder="" readonly>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">课程状态</label>
+                                <input type="hidden"  name = "status" for="status">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="modStatus">
+                                        <option value="已结束">已结束</option>
+                                        <option value="正进行">正进行</option>
+                                        <option value="未开始">未开始</option>
+                                    </select>
+                                </div>
+                            </div>
+		        		</form>
+                        <a id='mod'class="btn btn-danger block m-top-md">修改</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- detail-->
+		<div class="modal fade" id="detail" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">教学计划课程详细</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='addform' method="post" role="form" class="form-horizontal">
+                            <input id="detailid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="year">年度</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deYear" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="majorName">专业</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deMajorName" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="courseId">课程编码</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deCourseId" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="courseName">课程名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deCourseName" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="credit">学分</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deCredit" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="creditHour">学时</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deCreditHour" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="theoryCreditHour">理论学时</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deTheoryCreditHour" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="experimentCreditHour">实验学时</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deExperimentCreditHour" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="practiceCreditHour">实践学时</label>
+                                 <div class="col-sm-8">
+                                     <input class="form-control" id="dePracticeCreditHour" placeholder="">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="courseModule">课程模块</label>
+                                 <div class="col-sm-8">
+                                     <input class="form-control" id="deCourseModule" placeholder="">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="courseCategory">课程类别</label>
+                                 <div class="col-sm-8">
+                                     <input class="form-control" id="deCourseCategory" placeholder="">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="courseAttribution">课程性质</label>
+                                 <div class="col-sm-8">
+                                     <input class="form-control" id="deCourseAttribution" placeholder="">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="semester">上课学期</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deSemester" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="status">课程状态</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="deStatus" placeholder="">
+                                </div>
+				  			</div>
+		        		</form>
+                        <a id='close' class="btn btn-danger block m-top-md">关闭</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <div class="smart-widget-inner">
+            <div class="smart-widget-hidden-section">
+                <ul class="widget-color-list clearfix">
+                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
+                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
+					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
+					<li style="background-color:#2baab1;" data-color="widget-green"></li>
+					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
+					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
+					<li style="background-color:#e36159;" data-color="widget-red"></li>
+					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
+					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
+					<li style="background-color:#fff;" data-color="reset"></li>
+                </ul>
+            </div>
+            <div class="smart-widget-body">
+                <table style="border: 0px solid transparent !important;" aligh="center">
+                    <td width="60"><h5>课程</h5></td>
+                    <td width="300"><input type="text" class="form-control" id="myInput1"  onkeyup="myFunction1()" placeholder="搜索课程..." style="width:300px">{% comment %}<span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Go!</button>
+                    </span>{% endcomment %}</td>
+                    <td width="200"></td>
+                    {% comment %}<td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:5px">新增课程</button></td>{% endcomment %}
+                    <td width="200"><button class="btn btn-info btn-xs" style="padding:5px">返回</button></td>
+                </table>
+            <br/>
+
+                <table class="table table-bordered" id="usertable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>年度</th>
+                        <th>专业</th>
+                        <th style="display:none;">课程编号</th>
+                        <th>课程名称</th>
+                        <th style="display:none;">学分</th>
+                        <th style="display:none;">学时</th>
+                        <th style="display:none;">理论学时</th>
+                        <th style="display:none;">实验学时</th>
+                        <th style="display:none;">实践学时</th>
+                        <th style="display:none;">课程模块</th>
+                        <th style="display:none;">课程类别</th>
+                        <th style="display:none;">课程性质</th>
+                        <th>学期</th>
+                        <th>课程状态</th>
+                        <th>详细</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in eduPlanCoursesList %}
+                        <tr id="{{ i.id }}">
+                            <td>{{ i.count }}</td>
+                            <td>{{ i.year }}</td>
+                            <td>{{ i.majorName }}</td>
+                            <td style="display:none;">{{ i.courseId }}</td>
+                            <td>{{ i.courseName }}</td>
+                            <td style="display:none;">{{ i.credit }}</td>
+                            <td style="display:none;">{{ i.creditHour }}</td>
+                            <td style="display:none;">{{ i.theoryCreditHour }}</td>
+                            <td style="display:none;">{{ i.experimentCreditHour }}</td>
+                            <td style="display:none;">{{ i.practiceCreditHour }}</td>
+                            <td style="display:none;">{{ i.courseModule }}</td>
+                            <td style="display:none;">{{ i.courseCategory }}</td>
+                            <td style="display:none;">{{ i.courseAttribution }}</td>
+                            <td>{{ i.semester }}</td>
+                            <td>{{ i.status }}</td>
+                            <td>
+                                <button class="btn btn-info btn-xs detail">详细</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-info btn-xs xiugai">修改上课状态</button>
+                                {% comment %}<button class="btn btn-info btn-xs del">删除</button>{% endcomment %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+
+        $('#add').on('click',function(){
+            var year = $('#year').val();
+            var majorName = $('#majorName').val();
+            var courseName = $('#courseName').val();
+            var semester = $('#semester').val();
+
+            if(courseName==''){
+                $("#courseName").focus();
+            }else if(semester==''){
+                $("#semester").focus();
+            }{
+                var data = {}
+                data['year']=year;
+                data['majorName']=majorName;
+                data['courseName']=courseName;
+                data['semester']=semester;
+
+                $.ajax({
+                    url: '/Model/educationCoursesAdd/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result == "post_success" ) {
+                            window.location.reload();
+                        }else {
+                            alert(result);
+                        }
+                    }
+                })
+            }
+        });
+        $('.xiugai').on('click',function (){
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var courseName = tr.children("td").eq(4).text();
+            var status = tr.children("td").eq(14).text();
+
+            $('#modCourseName').val(courseName);
+            $('#modStatus').val(status);
+
+            $("#modid").val(id);
+            $("#modify").modal();
+        });
+        $('#mod').on('click',function () {
+            var status = $('#modStatus').val();
+            var courseName = $('#modCourseName').val();
+
+            if(courseName==''){
+                $("#modCourseName").focus();
+            }else if(status==''){
+                $("#modStatus").focus();
+            }else{
+                var data = {};
+                data['id'] = $("#modid").val();
+                data['courseName']=courseName;
+                data['status']=status;
+                $.ajax({
+                    url: '/Model/educationPlanCoursesModify/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.reload();
+                        } else {
+                            alert('修改未成功');
+                        }
+                    }
+                })
+            }
+        })
+        $('.del').on('click',function () {
+            var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
+            if (r==true) {
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
+                $.ajax({
+                    url: '/Model/educationCoursesDelete/',
+                    type: 'POST',
+                    data: {id: id},
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result.result == "post_success") {
+                            document.getElementById(result.id).remove();
+                            window.location.reload();
+                        } else {
+                            alert('删除未成功');
+                        }
+                    }
+                });
+            }
+
+        })
+        $('.detail').on('click',function (){
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var year = tr.children("td").eq(1).text();
+            var majorName = tr.children("td").eq(2).text();
+            var courseId = tr.children("td").eq(3).text();
+            var courseName = tr.children("td").eq(4).text();
+            var credit = tr.children("td").eq(5).text();
+            var creditHour = tr.children("td").eq(6).text();
+            var theoryCreditHour = tr.children("td").eq(7).text();
+            var experimentCreditHour = tr.children("td").eq(8).text();
+            var practiceCreditHour = tr.children("td").eq(9).text();
+            var courseModule = tr.children("td").eq(10).text();
+            var courseCategory = tr.children("td").eq(11).text();
+            var courseAttribution = tr.children("td").eq(12).text();
+            var semester = tr.children("td").eq(13).text();
+            var status = tr.children("td").eq(14).text();
+
+            $('#deYear').val(year);
+            $('#deMajorName').val(majorName);
+            $('#deCourseId').val(courseId);
+            $('#deCourseName').val(courseName);
+            $('#deCredit').val(credit);
+            $('#deCreditHour').val(creditHour);
+            $('#deTheoryCreditHour').val(theoryCreditHour);
+            $('#deExperimentCreditHour').val(experimentCreditHour);
+            $('#dePracticeCreditHour').val(practiceCreditHour);
+            $('#deCourseModule').val(courseModule);
+            $('#deCourseCategory').val(courseCategory);
+            $('#deCourseAttribution').val(courseAttribution);
+            $('#deSemester').val(semester);
+            $('#deCourseAttribution').val(courseAttribution);
+            $('#deStatus').val(status);
+
+            $("#detailid").val(id);
+            $("#detail").modal();
+        });
+        $('#close').on('click', function() {
+            window.location.reload();
+        })
+        {% comment %}退出功能 暂时没用上{% endcomment %}
+        $('.exit').on('click', function() {
+            if(confirm("您确定要退出吗？")) {
+                window.opener = null;
+                window.open('', '_self');
+                window.close();
+            } else {}
+        })
+        $('.xianxiuke').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var courseName = tr.children("td").eq(2).text();
+
+
+                var data = {};
+                data['courseName']=courseName;
+
+                $.ajax({
+                    url: '/Model/courses/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.href='/Model/coursePrevious/?courseName='+courseName;
+                        } else {
+                            alert('修改未成功');
+                        }
+                    }
+                })
+        })
+        function myFunction1() {
+            // 声明变量
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput1");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("usertable");
+            tr = table.getElementsByTagName("tr");
+
+            // 循环表格每一行，查找匹配项
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[2];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        var list = {{ list | safe }}
+        function fn1() {
+            var courseModule = $('#courseModule').val();
+            var courseCategory = $('#courseCategory').val();
+            var courseName = document.getElementById("courseName");
+            var str = "";
+            for(var i=0;i<list.length;i++){
+                if(courseModule==list[i].courseModule && courseCategory==list[i].courseCategory){
+                    var name = list[i].courseName;
+                    str += "<option value='" + name + "'>" + name + "</option>";
+                }
+            }
+            courseName.innerHTML = str;
+        }
+        function fn2() {
+            var courseName = $('#courseName').val();
+            var courseModule = document.getElementById("courseModule");
+            var courseCategory = document.getElementById("courseCategory");
+            var moduleStr = "";
+            var categoryStr = "";
+            for(var i=0;i<list.length;i++){
+                if(courseName==list[i].courseName){
+                    var module = list[i].courseModule;
+                    moduleStr += "<option value='" + module + "'>" + module + "</option>";
+                    var category = list[i].courseCategory;
+                    categoryStr += "<option value='" + category + "'>" + category + "</option>";
+                }
+            }
+            courseModule.innerHTML = moduleStr;
+            courseCategory.innerHTML = categoryStr;
+        }
+
+
+    </script>
+{% endblock %}

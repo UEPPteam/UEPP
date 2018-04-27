@@ -68,6 +68,7 @@ urlpatterns = [
     url(r'^educationMajorAdd/', educationMajorAdd),
     url(r'^educationMajorModify/', educationMajorModify),
     url(r'^educationMajorDelete/', educationMajorDelete),
+    url(r'^educationMajorImportMajors', educationMajorImportMajors),
     #专业课程
     url(r'^educationCourses/', educationCourses),
     url(r'^educationCoursesDelete/', educationCoursesDelete),
@@ -75,4 +76,8 @@ urlpatterns = [
     #教学计划
     url(r'^educationPlan/', educationPlan),
     url(r'^educationPlanDetail/', educationPlanDetail),
+    url(r'^educationPlanDetailAdd/', educationPlanDetailAdd),
+    url(r'^educationPlanDetailModify/', educationPlanDetailModify),
+    url(r'^educationPlanCourses/', educationPlanCourses),
+    url(r'^educationPlanCoursesModify/', educationPlanCoursesModify),
 ]

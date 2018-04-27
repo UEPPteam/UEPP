@@ -180,8 +180,10 @@
             if (r==true) {
                 var tr = $(this).parents("tr");
                 var id = tr.attr("id");
+                var year = tr.children("td").eq(1).text();
                 var data = {}
                 data['id'] = id;
+                data['year'] = year;
                 $.ajax({
                     url: '/Model/educationOverviewPizhun/',
                     type: 'POST',
@@ -203,8 +205,10 @@
             if (r==true) {
                 var tr = $(this).parents("tr");
                 var id = tr.attr("id");
+                var year = tr.children("td").eq(1).text();
                 var data = {}
                 data['id'] = id;
+                data['year'] = year;
                 $.ajax({
                     url: '/Model/educationOverviewChexiao/',
                     type: 'POST',

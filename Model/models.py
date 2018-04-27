@@ -102,3 +102,13 @@ class EducationCourses(models.Model):
     semester = models.CharField(max_length=45)
     courseAttribution = models.CharField(max_length=45)
 
+class EducationPlanCourses(models.Model):
+    year = models.IntegerField()
+    majorName = models.CharField(max_length=128)
+    educationPlanId = models.CharField(max_length=128)
+    courseName = models.CharField(max_length=128)
+    semester = models.CharField(max_length=45)
+    status = models.CharField(max_length=45)
+
+
+
