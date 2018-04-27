@@ -72,4 +72,7 @@ urlpatterns = [
     url(r'^educationCourses/', educationCourses),
     url(r'^educationCoursesDelete/', educationCoursesDelete),
     url(r'^educationCoursesAdd/', educationCoursesAdd),
+    #教学计划
+    url(r'^educationPlan/', educationPlan),
+    url(r'^educationPlanDetail/', educationPlanDetail),
 ]

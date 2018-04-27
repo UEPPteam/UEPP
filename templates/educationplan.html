@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+           教学大纲管理 > 教学计划
+            <span class="smart-widget-option">
+                <a href="#" class="widget-collapse-option" data-toggle="collapse">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+            </span>
+        </div>
+
+        <div class="smart-widget-inner">
+            <div class="smart-widget-hidden-section">
+                <ul class="widget-color-list clearfix">
+                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
+                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
+					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
+					<li style="background-color:#2baab1;" data-color="widget-green"></li>
+					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
+					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
+					<li style="background-color:#e36159;" data-color="widget-red"></li>
+					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
+					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
+					<li style="background-color:#fff;" data-color="reset"></li>
+                </ul>
+            </div>
+            <div class="smart-widget-body">
+                <table style="border: 0px solid transparent !important;" aligh="center">
+                    <td width="60"><h5>年度</h5></td>
+                    <td width="300"><input type="text" class="form-control" id="myInput1"  onkeyup="myFunction1()" placeholder="搜索年度..." style="width:300px">{% comment %}<span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Go!</button>
+                    </span>{% endcomment %}</td>
+                    <td width="200"></td>
+                </table>
+            <br/>
+                <table class="table table-bordered" id="usertable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>年度</th>
+                        <th>描述</th>
+                        <th>状态</th>
+                        <th>详细</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in eduOverviewList %}
+                        <tr id="{{ i.id }}">
+                            <td>{{ i.count }}</td>
+                            <td>{{ i.year }}</td>
+                            <td>{{ i.desc }}</td>
+                            <td>{{ i.status }}</td>
+                            <td><button class="btn btn-info btn-xs detail">详细</button></td>
+
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+
+
+        $('.detail').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var year = tr.children("td").eq(1).text();
+
+
+                var data = {};
+                data['year']=year;
+
+                $.ajax({
+                    url: '/Model/educationPlan/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.href='/Model/educationPlanDetail/?year='+year;
+                        } else {
+                            alert('修改未成功');
+                        }
+                    }
+                })
+        })
+
+
+        function myFunction1() {
+            // 声明变量
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput1");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("usertable");
+            tr = table.getElementsByTagName("tr");
+
+            // 循环表格每一行，查找匹配项
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+
+
+    </script>
+{% endblock %}

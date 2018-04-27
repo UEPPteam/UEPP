@@ -615,8 +615,11 @@ def educationOverview(request):
         data = {}
         eduOverview = EducationOverview.objects.all()
         eduOverviewList = []
+        count = 0
         for eo in eduOverview:
             eduOverviewInfo = {}
+            count += 1
+            eduOverviewInfo['count'] = count
             eduOverviewInfo['id'] = eo.id
             eduOverviewInfo['year'] = eo.year
             eduOverviewInfo['desc'] = eo.desc
@@ -1680,5 +1683,62 @@ def educationCoursesAdd(request):
 
         eduCourseList.save()
 
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 教学计划
+@csrf_exempt
+def educationPlan(request):
+    if request.method == 'GET':
+        data = {}
+        status = "已批准"
+        eduOverview = EducationOverview.objects.filter(status = status).all()
+        eduOverviewList = []
+        count = 0
+        for eo in eduOverview:
+            eduOverviewInfo = {}
+            count += 1
+            eduOverviewInfo['id'] = eo.id
+            eduOverviewInfo['count'] = count
+            eduOverviewInfo['year'] = eo.year
+            eduOverviewInfo['desc'] = eo.desc
+            eduOverviewInfo['status'] = eo.status
+
+            eduOverviewList.append(eduOverviewInfo)
+        data['eduOverviewList'] = eduOverviewList
+        return render(request, 'educationplan.html', data)
+    elif request.method == 'POST':
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 培养方案->版本->专业
+@csrf_exempt
+def educationPlanDetail(request):
+    if request.method == 'GET':
+        data = {}
+        eduMajor = EducationMajor.objects.all()
+        data={}
+        count = 0
+        year = request.GET.get('year')
+        eduMajor = EducationMajor.objects.filter(year=year).all()
+        eduMajorList = []
+        for em in eduMajor:
+            eduMajorInfo = {}
+            count += 1
+            eduMajorInfo['count']=count
+            eduMajorInfo['id'] = em.id
+            eduMajorInfo['year'] = em.year
+            eduMajorInfo['majorName'] = em.majorName
+
+            eduMajorList.append(eduMajorInfo)
+        specSubList = SpecializedSubject.objects.all()
+        spec_subList = []
+        for spec in specSubList:
+            spec_subList.append(spec.spec_sub)
+
+        data['spec_subList'] = spec_subList
+        data['eduMajorList'] = eduMajorList
+        return render(request, 'educationplandetail.html', data)
+    elif request.method == 'POST':
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')

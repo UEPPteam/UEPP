@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+           教学大纲管理 > 教学计划 > 专业
+            <span class="smart-widget-option">
+                <a href="#" class="widget-collapse-option" data-toggle="collapse">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+            </span>
+        </div>
+        <!-- add-->
+
+		<div class="modal fade" id="formInModal" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">新增方案专业</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="year">年度</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="year" placeholder="请输入年度">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">专业名称</label>
+                                <input type="hidden"  name = "majorName" for="majorName">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="majorName">
+                                         {% for majorName in spec_subList %}
+                                             <option value="{{ majorName }}">{{ majorName }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+		        		</form>
+                        <a id='add'class="btn btn-danger block m-top-md">添加</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- modify-->
+		<div class="modal fade" id="modify" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">修改专业</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='addform' method="post" role="form" class="form-horizontal">
+                            <input id="modid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="year">年度</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modYear" placeholder="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">专业名称</label>
+                                <input type="hidden"  name = "majorName" for="majorName">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="majorName">
+                                         {% for majorName in spec_subList %}
+                                             <option value="{{ majorName }}">{{ majorName }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+		        		</form>
+                        <a id='mod'class="btn btn-danger block m-top-md">修改</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <div class="smart-widget-inner">
+            <div class="smart-widget-hidden-section">
+                <ul class="widget-color-list clearfix">
+                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
+                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
+					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
+					<li style="background-color:#2baab1;" data-color="widget-green"></li>
+					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
+					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
+					<li style="background-color:#e36159;" data-color="widget-red"></li>
+					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
+					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
+					<li style="background-color:#fff;" data-color="reset"></li>
+                </ul>
+            </div>
+            <div class="smart-widget-body">
+                <table style="border: 0px solid transparent !important;" aligh="center">
+                    <td width="60"><h5>专业</h5></td>
+                    <td width="300"><input type="text" class="form-control" id="myInput1"  onkeyup="myFunction1()" placeholder="搜索专业..." style="width:300px">{% comment %}<span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Go!</button>
+                    </span>{% endcomment %}</td>
+                    <td width="200"></td>
+                </table>
+            <br/>
+                <table class="table table-bordered" id="usertable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>专业</th>
+                        <th>培养方案详细（表格）</th>
+                        <th>培养方案详细（图形）</th>
+                        <th style="display:none;">课程属性</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in eduMajorList %}
+                        <tr id="{{ i.id }}">
+                            <td>{{ i.count }}</td>
+                            <td>{{ i.majorName }}</td>
+                            <td><button class="btn btn-info btn-xs formdetail">修改教学计划</button></td>
+                            <td><button class="btn btn-info btn-xs graphdetail">修改教学计划</button></td>
+                            <td style="display:none;">{{ i.year }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+
+
+        $('.formdetail').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var year = tr.children("td").eq(5).text();
+            var majorName = tr.children("td").eq(1).text();
+                var data = {};
+                data['year']=year;
+                data['majorName']=majorName;
+
+                $.ajax({
+                    url: '/Model/educationMajor/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.href='/Model/educationCourses/?year='+year+'&majorName='+majorName;
+                        } else {
+                            alert('未成功');
+                        }
+                    }
+                })
+        })
+        function myFunction1() {
+            // 声明变量
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput1");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("usertable");
+            tr = table.getElementsByTagName("tr");
+
+            // 循环表格每一行，查找匹配项
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+
+    </script>
+{% endblock %}
