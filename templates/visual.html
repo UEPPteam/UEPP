@@ -40,6 +40,7 @@
       float: left;
       margin-left: 20px;
     }
+
     ol.vertical {
       margin: 0 0 9px 0;
       min-height: 10px; }
@@ -79,10 +80,12 @@
 
         <div class="smart-widget-inner">
             <div class="smart-widget-body">
+                <button class="btn btn-info btn-xs commit">提交</button>
+                <p></p>
                 <div class="row">
                     <div class="span4">
                         <p>第一学期</p>
-                        <ol class="simple_with_animation vertical s1">
+                        <ol class="simple_with_animation vertical sem1" sem="1">
 {#                          <li id="1">First</li>#}
 {#                          <li id="2">Second</li>#}
 {#                          <li id="3">Third</li>#}
@@ -90,43 +93,43 @@
                     </div>
                     <div class="span4">
                         <p>第二学期</p>
-                        <ol class="simple_with_animation vertical s2">
+                        <ol class="simple_with_animation vertical sem2" sem="2">
 
                         </ol>
                     </div>
                     <div class="span4">
                         <p>第三学期</p>
-                        <ol class="simple_with_animation vertical s3">
+                        <ol class="simple_with_animation vertical sem3" sem="3">
 
                         </ol>
                     </div>
                     <div class="span4">
                         <p>第四学期</p>
-                        <ol class="simple_with_animation vertical s4">
+                        <ol class="simple_with_animation vertical sem4" sem="4">
 
                         </ol>
                     </div>
                      <div class="span4">
                          <p>第五学期</p>
-                        <ol class="simple_with_animation vertical s5">
+                        <ol class="simple_with_animation vertical sem5" sem="5">
 
                         </ol>
                     </div>
                     <div class="span4">
                         <p>第六学期</p>
-                        <ol class="simple_with_animation vertical s6">
+                        <ol class="simple_with_animation vertical sem6" sem="6">
 
                         </ol>
                     </div>
                     <div class="span4">
                         <p>第七学期</p>
-                        <ol class="simple_with_animation vertical s7">
+                        <ol class="simple_with_animation vertical sem7" sem="7">
 
                         </ol>
                     </div>
                     <div class="span4">
                         <p>第八学期</p>
-                        <ol class="simple_with_animation vertical s8">
+                        <ol class="simple_with_animation vertical sem8" sem="8">
 
                         </ol>
                     </div>
@@ -142,15 +145,44 @@
         {#var data_next = [[], [3, 4], [4], [6], [5], [], []]     {#  #}
         {#var data_next = {"1":[3, 4], "2":[4], "3":[6], "4":[5], "5":[], "6":[]}     {# 每个节点的下一个节点 #}
         {#var data_pre = {"1":[], "2":[], "3":[1], "4":[1, 2], "5":[4], "6":[3]}     {#  每个节点的上一节点 #}
-        var data_next = {{ cn | safe }}
-        var data_pre = {{ cp | safe }}
-        var cl = {{ ecl | safe }}
+        var data_next = {{ cn | safe }};
+        var data_pre = {{ cp | safe }};
+        var cl = {{ ecl | safe }};
+        var year = "{{ year | safe }}";
+        var major = "{{ major | safe }}";
         for(var i=0; i<cl.length; i++){
             var crs = cl[i]
-            $('.s'+crs.semester).append("<li id='" + crs.courseName + "'>" + crs.courseName + "</li>")
+            var name = crs.courseName;
+            if(name.length > 5){
+                name = name.substr(0, 5) + "...";
+            }
+            $('.sem'+crs.semester).append("<li id='" + crs.courseName + "' title='" + crs.courseName + "'>" + name + "</li>")
         }
-        var adjustment;
 
+        $('.commit').on('click', function () {
+            var data = {}
+            data['cl'] = JSON.stringify(cl);
+            data['year'] = year;
+            data['major'] = major;
+            $.ajax({
+                url: '/Model/educationCoursesGraph/?year='+year+'&majorName='+major,
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                timeout: 10000,
+                success: function (result) {
+                    if (result == "post_success") {
+                        window.location.reload();
+                    } else {
+                        alert('修改未成功');
+                    }
+                }
+            });
+        })
+
+
+        var adjustment;
+        var und = false;
         $("ol.simple_with_animation").sortable({
           group: 'simple_with_animation',
           pullPlaceholder: false,
@@ -175,19 +207,30 @@
                   console.log(item.offset().left);
                   if(right < item.offset().left) right = item.offset().left;
               }
+              console.log(left + " " + right + " " + l);
+              l = parseInt(l);
+              left = parseInt(left);
+              right = parseInt(right);
+              console.log($nextitem);
               if(l <= left+29 && l >= right-29) {
                   var $clonedItem = $('<li/>').css({height: 0});
                   $item.before($clonedItem);
                   $clonedItem.animate({'height': $item.height()});
-
+                  und = false;
                   $item.animate($clonedItem.position(), function () {
                       $clonedItem.detach();
                       _super($item, container);
                   });
               }else{
-                  $nextitem.before($item);
+                  if(und) {
+                      $nextitem.append($item);
+                  }else{
+                      $nextitem.before($item);
+                  }
+                  und = false;
                   _super($item, container);
               }
+              {#console.log($item.offset().left);#}
               for(var it = 0; it < data_pre[i].length; it++){
                   var item = $('#' + data_pre[i][it]);
                   item.css({color:"#0088cc"})
@@ -198,7 +241,15 @@
               }
               $item.css({
                 color: "#0088cc"
-            });
+              });
+              var name = $item.attr("id");
+              var semeter = $item.parent().attr("sem");
+              for(var i = 0; i<cl.length; i++) {
+                  if (cl[i].courseName == name) {
+                      cl[i].semester = semeter;
+                  }
+              }
+              console.log(cl);
           },
 
           // set $item relative to cursor position
@@ -223,7 +274,14 @@
                   item.css({color:"red"})
             }
             window.$nextitem = $item.next();
-            if($nextitem.length == 0) $nextitem = $item.prev();
+            if($nextitem.length == 0) {
+                $nextitem = $item.prev();
+                {#$nextitem = $item.parent().after("<li></li>")#}
+            }
+            if($nextitem.length == 0) {
+                $nextitem = $item.parent();
+                und = true;
+            }
             _super($item, container);
           },
           onDrag: function ($item, position) {

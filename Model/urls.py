@@ -76,6 +76,7 @@ urlpatterns = [
     url(r'^educationCoursesAdd/', educationCoursesAdd),
     #教学计划
     url(r'^educationPlan/', educationPlan),
+    url(r'^educationPlanGraph/', educationPlanGraph),
     url(r'^educationPlanDetail/', educationPlanDetail),
     url(r'^educationPlanDetailAdd/', educationPlanDetailAdd),
     url(r'^educationPlanDetailModify/', educationPlanDetailModify),

@@ -212,6 +212,31 @@
                         }
                     }
                 })
+        });
+        $('.graphcourse').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var year = tr.children("td").eq(9).text();
+            var majorName = tr.children("td").eq(1).text();
+            var educationPlanId = tr.children("td").eq(2).text();
+                var data = {};
+                data['year']=year;
+                data['majorName']=majorName;
+
+                $.ajax({
+                    url: '/Model/educationPlanDetail/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.href='/Model/educationPlanGraph/?year='+year+'&majorName='+majorName+'&educationPlanId='+educationPlanId;
+                        } else {
+                            alert('未成功');
+                        }
+                    }
+                })
         })
         $('.xiugai').on('click',function (){
             var tr = $(this).parents("tr");
@@ -252,7 +277,7 @@
                     timeout: 10000,
                     success: function (result) {
                         if (result == "post_success") {
-                            window.location.reload();
+                        window.location.href='/Model/educationPlanGraph/?year='+year+'&majorName='+major+'&educationPlanId='+educationPlanId;
                         } else {
                             alert('修改未成功');
                         }

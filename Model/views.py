@@ -1523,9 +1523,19 @@ def educationCoursesGraph(request):
         data['ecl'] = eduCoursesList
         data['cp'] = course_p
         data['cn'] = course_n
-
+        data['year'] = year
+        data['major'] = majorName
         return render(request, 'visual.html', data)
-
+    if request.method == 'POST':
+        cl = request.POST.get("cl")
+        cl = json.loads(cl)
+        year = request.POST.get("year")
+        major = request.POST.get("major")
+        for c in cl:
+            name = c["courseName"]
+            EducationCourses.objects.filter(year=year, majorName=major, courseName=name).update(semester=semesterToStr(str(c["semester"])))
+        result = "post_success"
+        return HttpResponse(json.dumps(result), content_type='application/json')
 
 #培养方案 -> 版本 -> 专业 -> 培养方案表格
 @csrf_exempt
@@ -1847,6 +1857,25 @@ def semesterToInt(str):
         return 8
 
 
+def semesterToStr(str):
+    if str == "1":
+        return "一"
+    elif str == "2":
+        return "二"
+    elif str == "3":
+        return "三"
+    elif str == "4":
+        return "四"
+    elif str == "5":
+        return "五"
+    elif str == "6":
+        return "六"
+    elif str == "7":
+        return "七"
+    elif str == "8":
+        return "八"
+
+
 # 教学计划
 @csrf_exempt
 def educationPlan(request):
@@ -1871,6 +1900,7 @@ def educationPlan(request):
     elif request.method == 'POST':
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
+
 
 @csrf_exempt
 def educationPlanDetail(request):
@@ -1950,6 +1980,38 @@ def educationPlanDetailModify(request):
         EducationPlanCourses.objects.filter(id=id).update(year=year, majorName=majorName, educationPlanId=educationPlanId)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@csrf_exempt
+def educationPlanGraph(request):
+    if request.method == 'GET':
+        year = request.GET.get('year')
+        majorName = request.GET.get('majorName')
+        educationPlanId = request.GET.get('educationPlanId')
+        data = {}
+        eduPlanCourses = EducationPlanCourses.objects.filter(year=year, majorName=majorName,
+                                                             educationPlanId=educationPlanId).all()
+        eduPlanCoursesList = []
+        for epc in eduPlanCourses:
+            c = {}
+            c['courseName'] = epc.courseName
+            c['semester'] = semesterToInt(epc.semester)
+            c['status'] = status2int(epc.status.strip())
+            eduPlanCoursesList.append(c)
+        data['cl'] = eduPlanCoursesList
+
+        return render(request, 'visual_plan.html', data)
+
+
+def status2int(status):
+    if status == '未开始':
+        return 0;
+    elif status == '正进行':
+        return 1;
+    elif status == '已结束':
+        return 2;
+    else:
+        return 3;
 
 
 @csrf_exempt
