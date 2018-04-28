@@ -228,7 +228,7 @@
             }
         });
         $('.del').on('click',function () {
-            var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
+            var r=confirm("警告：您确定要删除此专业吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
                 var id = tr.attr("id");
@@ -243,7 +243,7 @@
                         if (result.result == "post_success") {
                             document.getElementById(result.id).remove();
                         } else {
-                            alert('删除未成功');
+                            alert('专业下有课程安排，请先删除课程安排');
                         }
                     }
                 });

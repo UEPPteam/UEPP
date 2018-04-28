@@ -252,6 +252,31 @@
                     }
                 })
         })
+
+        $('.graphdetail').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var year = tr.children("td").eq(5).text();
+            var majorName = tr.children("td").eq(1).text();
+                var data = {};
+                data['year']=year;
+                data['majorName']=majorName;
+
+                $.ajax({
+                    url: '/Model/educationMajor/',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            window.location.href='/Model/educationCoursesGraph/?year='+year+'&majorName='+majorName;
+                        } else {
+                            alert('未成功');
+                        }
+                    }
+                })
+        })
         function myFunction1() {
             // 声明变量
             var input, filter, table, tr, td, i;

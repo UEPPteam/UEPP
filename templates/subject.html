@@ -193,7 +193,7 @@
             }
         });
         $('.del').on('click',function () {
-            var r=confirm("警告：您确定要删除此课程吗？（此操作不可恢复）");
+            var r=confirm("警告：您确定要删除此学科吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
                 var id = tr.attr("id");
@@ -208,7 +208,7 @@
                         if (result.result == "post_success") {
                             document.getElementById(result.id).remove();
                         } else {
-                            alert('删除未成功');
+                            alert('此学科下有课程，请删除学科课程后再删除');
                         }
                     }
                 });

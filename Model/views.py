@@ -1490,6 +1490,43 @@ def eecDel(req):
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
+
+# graph
+@csrf_exempt
+def educationCoursesGraph(request):
+    if request.method == 'GET':
+        year = request.GET.get('year')
+        majorName = request.GET.get('majorName')
+        data = {}
+        course_p = {}
+        course_n = {}
+        eduCourses = EducationCourses.objects.filter(year=year, majorName=majorName)
+        eduCoursesList = []
+        for c in eduCourses:
+            eduCoursesInfo = {}
+            eduCoursesInfo['courseName'] = c.courseName
+            eduCoursesInfo['semester'] = semesterToInt(c.semester)
+            course_p[c.courseName] = []
+            course_n[c.courseName] = []
+            eduCoursesList.append(eduCoursesInfo)
+
+        course_pre = CoursePrevious.objects.all()
+        for cp in course_pre:
+            if cp.courseName not in course_p.keys():
+                course_p[cp.courseName] = []
+            course_p[cp.courseName].append(cp.pCourseName)
+
+            if cp.pCourseName not in course_n.keys():
+                course_n[cp.pCourseName] = []
+            course_n[cp.pCourseName].append(cp.courseName)
+
+        data['ecl'] = eduCoursesList
+        data['cp'] = course_p
+        data['cn'] = course_n
+
+        return render(request, 'visual.html', data)
+
+
 #培养方案 -> 版本 -> 专业 -> 培养方案表格
 @csrf_exempt
 def educationCourses(request):
