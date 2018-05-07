@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-           培养方案 > 版本
+           教学大纲管理 > 教学计划专业
             <span class="smart-widget-option">
                 <a href="#" class="widget-collapse-option" data-toggle="collapse">
                     <i class="fa fa-chevron-up"></i>
@@ -16,21 +16,26 @@
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">新建培养方案版本</h4>
+		        		<h4 class="modal-title" id="myModalLabel">新建教学计划</h4>
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
 				  			<div class="form-group">
-				    			<label class="control-label col-sm-3" for="year">编号</label>
+				    			<label class="control-label col-sm-3" for="grade">年级</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="year" placeholder="请输入编号">
+                                    <input class="form-control" id="grade" placeholder="请输入年级">
                                 </div>
 				  			</div>
                             <div class="form-group">
-							    <label class="control-label col-sm-3" for="desc">描述</label>
-                                 <div class="col-sm-8">
-                                     <input class="form-control" id="desc" placeholder="请输入描述">
-                                 </div>
+							    <label class="control-label col-sm-3" for="year">教学大纲</label>
+                                <input type="hidden"  name = "year" for="year">
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="year">
+                                         {% for i in eduOverviewList %}
+                                             <option value="{{ i.year }}">{{ i.year }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
                             </div>
 		        		</form>
                         <a id='add'class="btn btn-danger block m-top-md">添加</a>
@@ -38,6 +43,7 @@
 		    	</div>
 		  	</div>
 		</div>
+
 
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
@@ -56,38 +62,37 @@
             </div>
             <div class="smart-widget-body">
                 <table style="border: 0px solid transparent !important;" aligh="center">
-                    <td width="60"><h5>年度</h5></td>
-                    <td width="300"><input type="text" class="form-control" id="myInput1"  onkeyup="myFunction1()" placeholder="搜索年度..." style="width:300px">{% comment %}<span class="input-group-btn">
+                    <td width="60"><h5>专业名称</h5></td>
+                    <td width="300"><input type="text" class="form-control" id="myInput1"  onkeyup="myFunction1()" placeholder="搜索专业名称..." style="width:300px">{% comment %}<span class="input-group-btn">
                         <button class="btn btn-default" type="button">Go!</button>
                     </span>{% endcomment %}</td>
                     <td width="200"></td>
-                    <td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:5px">新建培养方案版本</button></td>
+                    {% comment %}<td width="200"><button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:5px">新建教学计划</button></td>{% endcomment %}
                 </table>
             <br/>
                 <table class="table table-bordered" id="usertable">
                     <thead>
                     <tr>
                         <th>ID</th>
-                        <th>编号</th>
-                        <th>描述</th>
-                        <th>详细</th>
-                        <th>状态</th>
-                        <th>操作</th>
+                        <th>年级</th>
+                        <th>教学大纲编号</th>
+                        <th>专业名称</th>
+                        <th>查看详细（表格）</th>
+                        <th>查看详细（图形）</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in eduOverviewList %}
+                    {% for i in eduPlanMajorList %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.count }}</td>
+                            <td>{{ i.grade }}</td>
                             <td>{{ i.year }}</td>
-                            <td>{{ i.desc }}</td>
-                            <td><button class="btn btn-info btn-xs detail">详细</button></td>
-                            <td>{{ i.status }}</td>
+                            <td>{{ i.majorName }}</td>
                             <td>
-                                <button class="btn btn-info btn-xs pizhun">批准</button>
-                                <button class="btn btn-info btn-xs chexiao">撤销</button>
-                                <button class="btn btn-info btn-xs del">删除</button>
+                                <button class="btn btn-info btn-xs formDetail">详细（表格）</button>
                             </td>
+                            <td><button class="btn btn-info btn-xs graphDetail">详细（图形）</button></td>
+
                         </tr>
                     {% endfor %}
 
@@ -102,17 +107,17 @@
 
         $('#add').on('click',function(){
             var year = $('#year').val();
-            var desc = $('#desc').val();
+            var grade = $('#grade').val();
             if(year==''){
                 $("#year").focus();
-            }else if(desc==''){
-                $("#desc").focus();
+            }else if(grade==''){
+                $("#grade").focus();
             }else{
                 var data = {}
                 data['year']=year;
-                data['desc']=desc;
+                data['grade']=grade;
                 $.ajax({
-                    url: '/Model/educationOverviewAdd/',
+                    url: '/Model/educationPlanAdd/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
@@ -128,103 +133,33 @@
             }
         });
 
-        $('.del').on('click',function () {
-            var r=confirm("警告：您确定要删除此版本吗？（此操作不可恢复）");
-            if (r==true) {
-                var tr = $(this).parents("tr");
-                var id = tr.attr("id");
-                $.ajax({
-                    url: '/Model/educationOverviewDelete/',
-                    type: 'POST',
-                    data: {id: id},
-                    dataType: 'json',
-                    timeout: 10000,
-                    success: function (result) {
-                        if (result.result == "post_success") {
-                            document.getElementById(result.id).remove();
-                            window.location.reload();
-                        } else {
-                            alert('删除未成功');
-                        }
-                    }
-                });
-            }
-
-        })
-        $('.detail').on('click',function () {
+        $('.formDetail').on('click',function () {
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
-            var year = tr.children("td").eq(1).text();
-
+            var grade = tr.children("td").eq(1).text();
+            var year = tr.children("td").eq(2).text();
+            var majorName = tr.children("td").eq(3).text();
 
                 var data = {};
                 data['year']=year;
 
                 $.ajax({
-                    url: '/Model/educationOverview/',
+                    url: '/Model/educationPlan/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
                     timeout: 10000,
                     success: function (result) {
                         if (result == "post_success") {
-                            window.location.href='/Model/educationMajor/?year='+year;
+                            window.location.href='/Model/educationPlanMajorDetail/?year='+year+'&grade='+grade+'&majorName='+majorName;
                         } else {
-                            alert('修改未成功');
-                        }
-                    }
-                })
-        })
-        $('.pizhun').on('click',function (){
-            var r=confirm("您确定要批准此大纲版本吗？");
-            if (r==true) {
-                var tr = $(this).parents("tr");
-                var id = tr.attr("id");
-                var year = tr.children("td").eq(1).text();
-                var data = {}
-                data['id'] = id;
-                data['year'] = year;
-                $.ajax({
-                    url: '/Model/educationOverviewPizhun/',
-                    type: 'POST',
-                    data: data,
-                    dataType: 'json',
-                    timeout: 10000,
-                    success: function(result) {
-                        if ( result == "post_success" ) {
-                            window.location.reload();
-                        }else {
                             alert('未成功');
                         }
                     }
                 })
-            }
         })
-        $('.chexiao').on('click',function (){
-            var r=confirm("您确定要撤销此大纲版本吗？");
-            if (r==true) {
-                var tr = $(this).parents("tr");
-                var id = tr.attr("id");
-                var year = tr.children("td").eq(1).text();
-                var data = {}
-                data['id'] = id;
-                data['year'] = year;
-                $.ajax({
-                    url: '/Model/educationOverviewChexiao/',
-                    type: 'POST',
-                    data: data,
-                    dataType: 'json',
-                    timeout: 10000,
-                    success: function(result) {
-                        if ( result == "post_success" ) {
-                            window.location.reload();
-                        }else {
-                            alert('未成功');
-                        }
-                    }
-                })
-            }
-        })
+
+
         function myFunction1() {
             // 声明变量
             var input, filter, table, tr, td, i;
@@ -235,7 +170,7 @@
 
             // 循环表格每一行，查找匹配项
             for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
+                td = tr[i].getElementsByTagName("td")[4];
                 if (td) {
                     if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";

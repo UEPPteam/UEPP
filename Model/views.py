@@ -678,10 +678,13 @@ def educationOverviewPizhun(request):
         status = "已批准"
         id = request.POST.get('id')
         year = request.POST.get('year')
+        '''
+        EducationPlanCourses.objects.filter(year=year).all().delete()
         eduCoursesList = EducationCourses.objects.filter(year=year).all()
         for ecl in eduCoursesList:
             eduPlanCoursesList = EducationPlanCourses(year=year, majorName=ecl.majorName, courseName=ecl.courseName, semester=ecl.semester)
             eduPlanCoursesList.save()
+        '''
         EducationOverview.objects.filter(id=id).update(status=status)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
@@ -692,10 +695,11 @@ def educationOverviewChexiao(request):
         status = "未批准"
         id = request.POST.get('id')
         year = request.POST.get('year')
+        '''
         eduCoursesList = EducationCourses.objects.filter(year=year).all()
         for ecl in eduCoursesList:
-            EducationPlanCourses.objects.filter(year=year, majorName=ecl.majorName, courseName=ecl.courseName,
-                                                semester=ecl.semester).all().delete()
+            EducationPlanCourses.objects.filter(year=year).all().delete()
+        '''
         EducationOverview.objects.filter(id=id).update(status=status)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
@@ -1695,68 +1699,7 @@ def educationCoursesAdd(request):
             creditHour = c.creditHour
             courseAttribution = c.courseAttribution
 
-
         '''
-        # 检查该年度该专业该学期是否有这门课，查重
-        educList = EducationCourses.objects.filter(year=year, majorName=majorName).all()
-        for e in educList:
-            if e.courseName==courseName:
-                result = "sorry,不能添加该课程。\n该课程已存在于该年度该专业中！"
-                return HttpResponse(json.dumps(result), content_type='application/json')
-
-        # 检查该课程是否学科平台课，若是，检查该专业是否在该学科下
-        courseSubjectList = CoursesInDisciplines.objects.filter(course=courseName).all()
-        courseSpecialSubjectList = CoreCoursesInSpecializedSubject.objects.filter(course=courseName).all()
-
-
-        for cs in courseSubjectList:
-            if cs.course==courseName:
-                subject = cs.subject
-                subjectSpecialList = SpecializedSubject.objects.filter(subject=subject).all()
-                for ssl in subjectSpecialList:
-                    if ssl.spec_sub==majorName:
-                        break
-                    else:
-                        result = "SORRY，不能添加该课。\n该课程为其他学科学科平台课，本专业不具有修改该课程的权限。"
-                        return HttpResponse(json.dumps(result), content_type='application/json')
-            else: #  检查是否为专业核心课
-                for css in courseSpecialSubjectList:
-                    if css.course==courseName:
-                        specSub = css.spec_sub
-                        if majorName==specSub:
-                            break
-                        else:
-                            result = "SORRY，不能添加该课。\n该课程为其他专业专业核心课，本专业不具有修改该课程的权限。"
-                            return HttpResponse(json.dumps(result), content_type='application/json')
-
-        for css in courseSpecialSubjectList:
-            if css.course == courseName:
-                specSub = css.spec_sub
-                if majorName == specSub:
-                    break
-                else:
-                    result = "SORRY，不能添加该课。\n该课程为其他专业专业核心课，本专业不具有修改该课程的权限。"
-                    return HttpResponse(json.dumps(result), content_type='application/json')
-
-        # 剩下检查是否为该专业课程
-        elecoursList = ElectiveCoursesInSpecializedSubject.objects.filter(course=courseName).all()
-        for ec in elecoursList:
-            if ec.spec_sub==majorName:
-                break
-            else:
-                result = "SORRY，不能添加该课。\n该课程不是本专业专业选修课，本专业不具有修改该课程的权限。"
-                return HttpResponse(json.dumps(result), content_type='application/json')
-
-        # 检查是否为任意选修课,好像没啥用这个判断
-        eleList = ElectiveCourses.objects.filter(course=courseName).all()
-        for el in eleList:
-            if courseName==el.course:
-                break
-            else:
-                result = "SORRY，不能添加该课。\n该课程既不是本专业专业核心课和专业选修课，也不是该专业学科的学科平台课，也不是任意选修课，本专业不具有修改该课程的权限。"
-                return HttpResponse(json.dumps(result), content_type='application/json')
-        '''
-
         result = checkAddAuthority(year, courseName, majorName)
         if result == 'post_success':
             result = checkAddPrevious(year, courseName, semester)
@@ -1764,19 +1707,57 @@ def educationCoursesAdd(request):
                 eduCourseList = EducationCourses(year=year, majorName=majorName, courseId=courseId, courseName=courseName, semester=semester,
                                          credit=credit, creditHour=creditHour, courseAttribution=courseAttribution)
                 eduCourseList.save()
+        '''
+        # 检查该年度该专业该学期是否有这门课，查重
+        educList = EducationCourses.objects.filter(year=year, majorName=majorName).all()
+        for e in educList:
+            if e.courseName == courseName:
+                result = "sorry,不能修改该课程。\n该课程已存在于该年度该专业中！"
+                return HttpResponse(json.dumps(result), content_type='application/json')
 
-        # result = 'post_success'
+        eduCourses = EducationCourses.objects.all()
+        for ec in eduCourses:
+            if courseName == ec.courseName:
+                semester = ec.semester
+                break
+
+        result = checkModifyPrevious(year, majorName, courseName, semester)
+        if result == 'post_success':
+            eduCourseList = EducationCourses(year=year, majorName=majorName, courseId=courseId, courseName=courseName,
+                                             semester=semester,
+                                             credit=credit, creditHour=creditHour, courseAttribution=courseAttribution)
+            eduCourseList.save()
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+@csrf_exempt
+def educationCoursesModify(request):
+    if request.method == 'POST':
+        year = request.POST.get('year')
+        majorName = request.POST.get('majorName')
+        courseName = request.POST.get('courseName')
+        semester = request.POST.get('semester')
+
+        id = request.POST.get('id')
+        result = checkAddAuthority(year, courseName, majorName)
+        if result == 'post_success':
+            result = checkAddPrevious(year, courseName, semester)
+            if result == 'post_success':
+                EducationCourses.objects.filter(year=year, courseName=courseName).update(semester=semester)
+
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 # 约束检查函数:检查是否有权限添加该课
 @csrf_exempt
 def checkAddAuthority(year, courseName, majorName):
+
     # 检查该年度该专业该学期是否有这门课，查重
+    '''
     educList = EducationCourses.objects.filter(year=year, majorName=majorName).all()
     for e in educList:
         if e.courseName == courseName:
-            result = "sorry,不能添加该课程。\n该课程已存在于该年度该专业中！"
+            result = "sorry,不能修改该课程。\n该课程已存在于该年度该专业中！"
             return result
+    '''
 
     # 检查该课程是否学科平台课，若是，检查该专业是否在该学科下
     courseSubjectList = CoursesInDisciplines.objects.filter(course=courseName).all()
@@ -1790,7 +1771,7 @@ def checkAddAuthority(year, courseName, majorName):
                 if ssl.spec_sub == majorName:
                     break
                 else:
-                    result = "SORRY，不能添加该课。\n该课程为其他学科学科平台课，本专业不具有修改该课程的权限。"
+                    result = "SORRY，不能修改该课。\n该课程为其他学科学科平台课，本专业不具有修改该课程的权限。"
                     return result
         else:  # 检查是否为专业核心课
             for css in courseSpecialSubjectList:
@@ -1799,7 +1780,7 @@ def checkAddAuthority(year, courseName, majorName):
                     if majorName == specSub:
                         break
                     else:
-                        result = "SORRY，不能添加该课。\n该课程为其他专业专业核心课，本专业不具有修改该课程的权限。"
+                        result = "SORRY，不能修改该课。\n该课程为其他专业专业核心课，本专业不具有修改该课程的权限。"
                         return result
 
     for css in courseSpecialSubjectList:
@@ -1808,7 +1789,7 @@ def checkAddAuthority(year, courseName, majorName):
             if majorName == specSub:
                 break
             else:
-                result = "SORRY，不能添加该课。\n该课程为其他专业专业核心课，本专业不具有修改该课程的权限。"
+                result = "SORRY，不能修改该课。\n该课程为其他专业专业核心课，本专业不具有修改该课程的权限。"
                 return result
 
     # 剩下检查是否为该专业课程
@@ -1817,8 +1798,22 @@ def checkAddAuthority(year, courseName, majorName):
         if ec.spec_sub == majorName:
             break
         else:
-            result = "SORRY，不能添加该课。\n该课程不是本专业专业选修课，本专业不具有修改该课程的权限。"
+            result = "SORRY，不能修改该课。\n该课程不是本专业专业选修课，本专业不具有修改该课程的权限。"
             return result
+
+    return 'post_success'
+
+# 约束检查函数:检查先修课约束
+@csrf_exempt
+def checkModifyPrevious(year, majorName, courseName, semester):
+    coursePreviousList = CoursePrevious.objects.filter(courseName=courseName).all()
+    for cpl in coursePreviousList:
+        pCoursesList = EducationCourses.objects.filter(year=year, majorName=majorName, courseName=cpl.pCourseName).all()
+        for pcl in pCoursesList:
+            pclSemester = semesterToInt(pcl.semester)
+            if pclSemester > semesterToInt(semester):
+                result = "sorry，不能添加该课。\n该课程有先修课在此课添加学期前，请先修改先修课：" + cpl.pCourseName + " 上课学期再添加该课。"
+                return result
 
     return 'post_success'
 
@@ -1830,8 +1825,8 @@ def checkAddPrevious(year, courseName, semester):
         pCoursesList = EducationCourses.objects.filter(year=year, courseName=cpl.pCourseName).all()
         for pcl in pCoursesList:
             pclSemester = semesterToInt(pcl.semester)
-            if pclSemester > semesterToInt(semester):
-                result = "sorry，不能添加该课。\n该课程有先修课在此课添加学期前，请先修改先修课：" + cpl.courseName + " 上课学期再添加该课。"
+            if pclSemester >= semesterToInt(semester):
+                result = "sorry，不能修改该课。\n该课程有先修课在此课添加学期前，请先修改先修课：" + cpl.pCourseName + " 上课学期再修改该课。"
                 return result
 
     return 'post_success'
@@ -1882,34 +1877,174 @@ def educationPlan(request):
     if request.method == 'GET':
         data = {}
         status = "已批准"
-        eduOverview = EducationOverview.objects.filter(status = status).all()
-        eduOverviewList = []
+        eduPlan = EducationPlan.objects.all()
+        eduOverviewList = EducationOverview.objects.filter(status=status).all()
+        eduPlanList = []
         count = 0
-        for eo in eduOverview:
-            eduOverviewInfo = {}
+        for ep in eduPlan:
+            eduPlanInfo = {}
             count += 1
-            eduOverviewInfo['id'] = eo.id
-            eduOverviewInfo['count'] = count
-            eduOverviewInfo['year'] = eo.year
-            eduOverviewInfo['desc'] = eo.desc
-            eduOverviewInfo['status'] = eo.status
+            eduPlanInfo['id'] = ep.id
+            eduPlanInfo['count'] = count
+            eduPlanInfo['grade'] = ep.grade
+            eduPlanInfo['year'] = ep.year
 
-            eduOverviewList.append(eduOverviewInfo)
+            eduPlanList.append(eduPlanInfo)
+        data['eduPlanList'] = eduPlanList
         data['eduOverviewList'] = eduOverviewList
         return render(request, 'educationplan.html', data)
     elif request.method == 'POST':
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
+@csrf_exempt
+def educationPlanAdd(request):
+    if request.method == "POST":
+        year = request.POST.get('year')
+        grade = request.POST.get('grade')
+
+        list = EducationPlan(year=year, grade=grade)
+        list.save()
+
+        spec_sub = SpecializedSubject.objects.all()
+        for ss in spec_sub:
+            eduPlanMajorList = EducationPlanMajor(year=year, grade=grade, majorName=ss.spec_sub)
+            eduPlanMajorList.save()
+            eduPlanMajorSemesterList1 = EducationPlanMajorSemester(year=year, grade=grade, majorName=ss.spec_sub,
+                                                                   semester="一")
+            eduPlanMajorSemesterList1.save()
+            eduPlanMajorSemesterList2 = EducationPlanMajorSemester(year=year, grade=grade, majorName=ss.spec_sub,
+                                                                   semester="二")
+            eduPlanMajorSemesterList2.save()
+            eduPlanMajorSemesterList3 = EducationPlanMajorSemester(year=year, grade=grade, majorName=ss.spec_sub,
+                                                                   semester="三")
+            eduPlanMajorSemesterList3.save()
+            eduPlanMajorSemesterList4 = EducationPlanMajorSemester(year=year, grade=grade, majorName=ss.spec_sub,
+                                                                   semester="四")
+            eduPlanMajorSemesterList4.save()
+            eduPlanMajorSemesterList5 = EducationPlanMajorSemester(year=year, grade=grade, majorName=ss.spec_sub,
+                                                                   semester="五")
+            eduPlanMajorSemesterList5.save()
+            eduPlanMajorSemesterList6 = EducationPlanMajorSemester(year=year, grade=grade, majorName=ss.spec_sub,
+                                                                   semester="六")
+            eduPlanMajorSemesterList6.save()
+            eduPlanMajorSemesterList7 = EducationPlanMajorSemester(year=year, grade=grade, majorName=ss.spec_sub,
+                                                                   semester="七")
+            eduPlanMajorSemesterList7.save()
+            eduPlanMajorSemesterList8 = EducationPlanMajorSemester(year=year, grade=grade, majorName=ss.spec_sub,
+                                                                   semester="八")
+            eduPlanMajorSemesterList8.save()
+
+        EducationPlanCourses.objects.filter(year=year, grade=grade).all().delete()
+        eduCoursesList = EducationCourses.objects.filter(year=year).all()
+        for ecl in eduCoursesList:
+            eduPlanCoursesList = EducationPlanCourses(year=year, majorName=ecl.majorName, courseName=ecl.courseName,
+                                                      semester=ecl.semester, grade=grade)
+            eduPlanCoursesList.save()
+
+
+
+        result = 'post_success'
+
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+@csrf_exempt
+def educationPlanDelete(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        EducationPlan.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 @csrf_exempt
 def educationPlanDetail(request):
     if request.method == 'GET':
         data = {}
+        count = 0
+        grade = request.GET.get('grade')
+        year = request.GET.get('year')
+        eduPlanMajor = EducationPlanMajor.objects.filter(year=year, grade=grade).all()
+        eduPlanMajorList = []
+        for epm in eduPlanMajor:
+            eduPlanMajorInfo = {}
+            count += 1
+            eduPlanMajorInfo['count']=count
+            eduPlanMajorInfo['id'] = epm.id
+            eduPlanMajorInfo['year'] = epm.year
+            eduPlanMajorInfo['grade'] = epm.grade
+            eduPlanMajorInfo['majorName'] = epm.majorName
+
+            eduPlanMajorList.append(eduPlanMajorInfo)
+
+        data['eduPlanMajorList'] = eduPlanMajorList
+        data['year'] = year
+        return render(request, 'educationplanmajor.html', data)
+    elif request.method == 'POST':
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+@csrf_exempt
+def educationPlanMajorDetail(request):
+    if request.method == 'GET':
+        data = {}
+        count = 0
+        year = request.GET.get('year')
+        grade = request.GET.get('grade')
+        majorName = request.GET.get('majorName')
+        eduPlanMajorSemester = EducationPlanMajorSemester.objects.filter(year=year, grade=grade, majorName=majorName).all()
+        eduPlanMajorSemesterList = []
+        flagSet = set('')
+        for epms in eduPlanMajorSemester:
+            eduPlanMajorSemesterInfo = {}
+            if epms.semester in flagSet:
+                continue
+            else:
+                eduPlanCourses = EducationPlanCourses.objects.filter(grade=grade, year=year, majorName=majorName, semester=epms.semester)
+                eduPlanCoursesDict = {}
+                eduPlanCoursesDict['finished'] = 0
+                eduPlanCoursesDict['started'] = 0
+                eduPlanCoursesDict['unstarted'] = 0
+                for e in eduPlanCourses:
+                    if e.status == "已结束":
+                        eduPlanCoursesDict['finished'] += 1
+                    elif e.status == "正进行":
+                        eduPlanCoursesDict['started'] += 1
+                    elif e.status == "未开始":
+                        eduPlanCoursesDict['unstarted'] += 1
+                count += 1
+
+                flagSet.add(epms.semester)
+                eduPlanMajorSemesterInfo['count'] = count
+                eduPlanMajorSemesterInfo['id'] = epms.id
+                eduPlanMajorSemesterInfo['year'] = epms.year
+                eduPlanMajorSemesterInfo['educationPlanId'] = epms.educationPlanId
+                eduPlanMajorSemesterInfo['semester'] = epms.semester
+                eduPlanMajorSemesterInfo['majorName'] = epms.majorName
+                eduPlanMajorSemesterInfo['grade'] = epms.grade
+                eduPlanMajorSemesterInfo['finished'] = eduPlanCoursesDict['finished']
+                eduPlanMajorSemesterInfo['started'] = eduPlanCoursesDict['started']
+                eduPlanMajorSemesterInfo['unstarted'] = eduPlanCoursesDict['unstarted']
+                eduPlanMajorSemesterList.append(eduPlanMajorSemesterInfo)
+
+
+        data['eduPlanMajorSemesterList'] = eduPlanMajorSemesterList
+        return render(request, 'educationplandetail.html', data)
+    elif request.method == 'POST':
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+'''
+@csrf_exempt
+def educationPlanMajorDetail(request):
+    if request.method == 'GET':
         data={}
         count = 0
         year = request.GET.get('year')
-        eduPlanCourses = EducationPlanCourses.objects.filter(year=year).all()
+        grade = request.GET.get('grade')
+        majorName = request.GET.get('majorName')
+        eduPlanCourses = EducationPlanCourses.objects.filter(year=year, grade=grade, majorName=majorName).all()
         eduPlanDetailList = []
         flagSet = set('')
         for epc in eduPlanCourses:
@@ -1954,6 +2089,7 @@ def educationPlanDetail(request):
     elif request.method == 'POST':
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
+'''
 
 @csrf_exempt
 def educationPlanDetailAdd(request):
@@ -1971,13 +2107,13 @@ def educationPlanDetailAdd(request):
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 @csrf_exempt
-def educationPlanDetailModify(request):
+def educationPlanMajorModify(request):
     if request.method == 'POST':
-        year = request.POST.get('year')
+        grade = request.POST.get('grade')
         majorName = request.POST.get('majorName')
         educationPlanId = request.POST.get('educationPlanId')
         id = request.POST.get('id')
-        EducationPlanCourses.objects.filter(id=id).update(year=year, majorName=majorName, educationPlanId=educationPlanId)
+        EducationPlanMajorSemester.objects.filter(id=id).update(grade=grade, majorName=majorName, educationPlanId=educationPlanId)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -2017,14 +2153,15 @@ def status2int(status):
 @csrf_exempt
 def educationPlanCourses(request):
     if request.method == 'GET':
-        data = {}
         eduMajor = EducationMajor.objects.all()
         data={}
         count = 0
+        grade = request.GET.get('grade')
         year = request.GET.get('year')
         majorName = request.GET.get('majorName')
         educationPlanId = request.GET.get('educationPlanId')
-        eduPlanCourses = EducationPlanCourses.objects.filter(year=year, majorName=majorName, educationPlanId=educationPlanId).all()
+        semester = request.GET.get('semester')
+        eduPlanCourses = EducationPlanCourses.objects.filter(grade=grade, year=year, majorName=majorName, semester=semester).all()
         eduPlanCoursesList = []
 
         for epc in eduPlanCourses:
@@ -2067,5 +2204,29 @@ def educationPlanCoursesModify(request):
         status = request.POST.get('status')
         id = request.POST.get('id')
         EducationPlanCourses.objects.filter(id=id).update(courseName=courseName, status=status)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 教学计划专业
+@csrf_exempt
+def educationPlanMajor(request):
+    if request.method == 'GET':
+        data = {}
+        eduPlanMajor = EducationPlanMajor.objects.all()
+        eduPlanMajorList = []
+        count = 0
+        for epm in eduPlanMajor:
+            eduPlanMajorInfo = {}
+            count += 1
+            eduPlanMajorInfo['id'] = epm.id
+            eduPlanMajorInfo['count'] = count
+            eduPlanMajorInfo['grade'] = epm.grade
+            eduPlanMajorInfo['year'] = epm.year
+            eduPlanMajorInfo['majorName'] = epm.majorName
+
+            eduPlanMajorList.append(eduPlanMajorInfo)
+        data['eduPlanMajorList'] = eduPlanMajorList
+        return render(request, 'educationplanmajor.html', data)
+    elif request.method == 'POST':
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')

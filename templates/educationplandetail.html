@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-           教学大纲管理 > 教学计划 > 专业
+           教学大纲管理 > 教学计划专业 > 专业计划
             <span class="smart-widget-option">
                 <a href="#" class="widget-collapse-option" data-toggle="collapse">
                     <i class="fa fa-chevron-up"></i>
@@ -55,32 +55,27 @@
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">修改教学计划</h4>
+		        		<h4 class="modal-title" id="myModalLabel">修改专业计划</h4>
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='addform' method="post" role="form" class="form-horizontal">
                             <input id="modid" type="hidden">
 				  			<div class="form-group">
-				    			<label class="control-label col-sm-3" for="year">年度</label>
+				    			<label class="control-label col-sm-3" for="grade">年级</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="modYear" placeholder="" readonly>
+                                    <input class="form-control" id="modGrade" readonly>
                                 </div>
 				  			</div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">专业名称</label>
-                                <input type="hidden"  name = "majorName" for="majorName">
+				    			<label class="control-label col-sm-3" for="majorName">专业名称</label>
                                 <div class="col-sm-8">
-                                    <select class="form-control" id="modMajorName">
-                                         {% for majorName in spec_subList %}
-                                             <option value="{{ majorName }}">{{ majorName }}</option>
-                                         {% endfor %}
-                                    </select>
+                                    <input class="form-control" id="modMajorName" readonly>
                                 </div>
-                            </div>
+				  			</div>
                             <div class="form-group">
 				    			<label class="control-label col-sm-3" for="educationPlanId">教学计划编号</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="modEducationPlanId" placeholder="">
+                                    <input class="form-control" id="modEducationPlanId" placeholder="请输入教学计划编号">
                                 </div>
 				  			</div>
 		        		</form>
@@ -120,29 +115,33 @@
                         <th>ID</th>
                         <th>专业</th>
                         <th>教学计划编号</th>
+                        <th>学期</th>
                         <th>已结束课数</th>
                         <th>正进行课数</th>
                         <th>未开始课数</th>
                         <th>操作</th>
-                        <th>查看计划（表格）</th>
-                        <th>查看计划（图形）</th>
-                        <th style="display:none;">年度</th>
+                        <th>查看课程</th>
+                        {% comment %}<th>查看计划（图形）</th>{% endcomment %}
+                        <th style="display:none;">年级</th>
+                        <th style="display:none;">教学大纲编号</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in eduPlanDetailList %}
+                    {% for i in eduPlanMajorSemesterList %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.count }}</td>
                             <td>{{ i.majorName }}</td>
                             <td>{{ i.educationPlanId }}</td>
+                            <td>{{ i.semester }}</td>
                             <td>{{ i.finished }}</td>
                             <td>{{ i.started }}</td>
                             <td>{{ i.unstarted }}</td>
                             <td>
                                 <button class="btn btn-info btn-xs xiugai">编辑</button>
                             </td>
-                            <td><button class="btn btn-info btn-xs formcourse">查看教学计划</button></td>
-                            <td><button class="btn btn-info btn-xs graphcourse">查看教学计划</button></td>
+                            <td><button class="btn btn-info btn-xs formcourse">查看课程</button></td>
+                            {% comment %}<td><button class="btn btn-info btn-xs graphcourse">查看教学计划</button></td>{% endcomment %}
+                            <td style="display:none;">{{ i.grade }}</td>
                             <td style="display:none;">{{ i.year }}</td>
                         </tr>
                     {% endfor %}
@@ -191,22 +190,25 @@
         $('.formcourse').on('click',function () {
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
-            var year = tr.children("td").eq(9).text();
+            var grade = tr.children("td").eq(9).text();
+            var year = tr.children("td").eq(10).text();
             var majorName = tr.children("td").eq(1).text();
             var educationPlanId = tr.children("td").eq(2).text();
+            var semester = tr.children("td").eq(3).text();
                 var data = {};
                 data['year']=year;
                 data['majorName']=majorName;
 
                 $.ajax({
-                    url: '/Model/educationPlanDetail/',
+                    url: '/Model/educationPlanMajorDetail/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
                     timeout: 10000,
                     success: function (result) {
                         if (result == "post_success") {
-                            window.location.href='/Model/educationPlanCourses/?year='+year+'&majorName='+majorName+'&educationPlanId='+educationPlanId;
+                            window.location.href='/Model/educationPlanCourses/?grade='+grade+'&majorName='+majorName+'&educationPlanId='+educationPlanId
+                            +'&semester='+semester+'&year='+year;
                         } else {
                             alert('未成功');
                         }
@@ -241,21 +243,21 @@
         $('.xiugai').on('click',function (){
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
-            var year = tr.children("td").eq(9).text();
+            var grade = tr.children("td").eq(10).text();
             var majorName = tr.children("td").eq(1).text();
             var educationPlanId = tr.children("td").eq(2).text();
 
-            $('#modYear').val(year);
+            $('#modGrade').val(grade);
             $('#modMajorName').val(majorName);
             $('#modEducationPlanId').val(educationPlanId);
             $("#modid").val(id);
             $("#modify").modal();
         });
         $('#mod').on('click',function () {
-            var year = $('#modYear').val();
+            var grade = $('#modGrade').val();
             var majorName = $('#modMajorName').val();
             var educationPlanId = $('#modEducationPlanId').val();
-            if(year==''){
+            if(grade==''){
                 $("#modYear").focus();
             }else if(majorName==''){
                 $("#modMajorName").focus();
@@ -265,19 +267,18 @@
                 var data = {};
 
                 data['id'] = $("#modid").val();
-                data['year']=year;
+                data['grade']=grade;
                 data['majorName']=majorName;
-
                 data['educationPlanId']=educationPlanId;
                 $.ajax({
-                    url: '/Model/educationPlanDetailModify/',
+                    url: '/Model/educationPlanMajorModify/',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
                     timeout: 10000,
                     success: function (result) {
                         if (result == "post_success") {
-                        window.location.href='/Model/educationPlanGraph/?year='+year+'&majorName='+major+'&educationPlanId='+educationPlanId;
+                        window.location.reload();
                         } else {
                             alert('修改未成功');
                         }

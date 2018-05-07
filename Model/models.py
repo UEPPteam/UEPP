@@ -84,16 +84,16 @@ class CoursePrevious(models.Model):
     pCourseName = models.CharField(max_length=128)
 
 class EducationOverview(models.Model):
-    year = models.IntegerField()
+    year = models.CharField(max_length=128)
     desc = models.CharField(max_length=180)
     status = models.CharField(max_length=45)
 
 class EducationMajor(models.Model):
-    year = models.IntegerField()
+    year = models.CharField(max_length=128)
     majorName = models.CharField(max_length=128)
 
 class EducationCourses(models.Model):
-    year = models.IntegerField()
+    year = models.CharField(max_length=128)
     majorName = models.CharField(max_length=128)
     courseId = models.CharField(max_length=45)
     courseName = models.CharField(max_length=128)
@@ -103,12 +103,30 @@ class EducationCourses(models.Model):
     courseAttribution = models.CharField(max_length=45)
 
 class EducationPlanCourses(models.Model):
-    year = models.IntegerField()
+    grade = models.CharField(max_length=128)
+    year = models.CharField(max_length=128)
     majorName = models.CharField(max_length=128)
     educationPlanId = models.CharField(max_length=128)
     courseName = models.CharField(max_length=128)
     semester = models.CharField(max_length=45)
     status = models.CharField(max_length=45)
+
+class EducationPlan(models.Model):
+    grade = models.CharField(max_length=128)
+    year = models.CharField(max_length=128)
+
+class EducationPlanMajor(models.Model):
+    grade = models.CharField(max_length=128)
+    year = models.CharField(max_length=128)
+    majorName = models.CharField(max_length=128)
+
+class EducationPlanMajorSemester(models.Model):
+    grade = models.CharField(max_length=128)
+    year = models.CharField(max_length=128)
+    majorName = models.CharField(max_length=128)
+    educationPlanId = models.CharField(max_length=128)
+    semester = models.CharField(max_length=45)
+
 
 
 
